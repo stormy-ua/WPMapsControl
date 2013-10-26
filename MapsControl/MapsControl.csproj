@@ -83,25 +83,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="MapsControl.cs" />
     <Compile Include="Rendering\BorderTileElementBuilder.cs" />
     <Compile Include="Rendering\DebugImageTileElementBuilder.cs" />
     <Compile Include="Rendering\ImageTileElementBuilder.cs" />
     <Compile Include="Engine\ITileController.cs" />
     <Compile Include="Rendering\ITileElementBuilder.cs" />
-    <Compile Include="MapsControl.xaml.cs">
-      <DependentUpon>MapsControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Engine\Tile.cs" />
     <Compile Include="Engine\TileController.cs" />
     <Compile Include="Engine\TileControllerBuilder.cs" />
     <Compile Include="Engine\MapMath.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="MapsControl.xaml">
+    <Resource Include="Themes\generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="README_FIRST.txt" />

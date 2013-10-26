@@ -42,15 +42,18 @@
 
         <!--TitlePanel contains the name of the application and page title-->
         <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,17,0,28">
-            <TextBlock Text="MY APPLICATION" Style="{StaticResource PhoneTextNormalStyle}" Margin="12,0"/>
-            <TextBlock Text="page name" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
+            <TextBlock Text="SAMPLE APPLICATION" Style="{StaticResource PhoneTextNormalStyle}" Margin="12,0"/>
+            <TextBlock Text="Maps Control" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
         </StackPanel>
 
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
             <mapsControl:MapsControl x:Name="Map" 
                                      GeoCoordinateCenter="50.39456,30.597448"
-                                     LevelOfDetails="15"/>
+                                     LevelOfDetails="15">
+                <Ellipse Width="10" Height="10"/>
+                <Ellipse Width="10" Height="10"/>
+            </mapsControl:MapsControl>
             <Button Content="+" Width="80" Height="80" Background="Black"
                     VerticalAlignment="Top" HorizontalAlignment="Left"
                     Click="ZoomInButtonOnClick"/>

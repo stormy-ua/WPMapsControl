@@ -3,61 +3,46 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Device.Location;
 using System.Linq;
-using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using MapsControl.Engine;
 using MapsControl.Rendering;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Maps.Controls;
-using Microsoft.Phone.Shell;
 
 namespace MapsControl
 {
-/*    public interface ITileElement
-    {
-        UIElement UiElement { get; set; }
-        void SetImage(BitmapImage bitmapImage);
-    }
-
-    public class ImageTileElement : ITileElement
-    {
-        public UIElement UiElement { get; set; }
-
-        public void SetImage(BitmapImage bitmapImage)
-        {
-            var image = (Image)((Grid)(((Border)_tileElements[j]).Child)).Children[0];
-            image.Source = new BitmapImage(new Uri(tile.Uri));
-        }
-    }*/
-
-    public partial class MapsControl : UserControl
+    [ContentProperty("MapElements")]
+    public class MapsControl : Control
     {
         #region GeoCoordinateCenter Property
 
         public static readonly DependencyProperty GeoCoordinateCenterProperty =
-            DependencyProperty.Register("GeoCoordinateCenter", typeof (GeoCoordinate), typeof (MapsControl),
+            DependencyProperty.Register("GeoCoordinateCenter", typeof(GeoCoordinate), typeof(MapsControl),
                                         new PropertyMetadata(default(GeoCoordinate),
                                                              OnGeoCoordinateCenterPropertyChanged));
 
-        [TypeConverter(typeof (GeoCoordinateConverter))]
+        [TypeConverter(typeof(GeoCoordinateConverter))]
         public GeoCoordinate GeoCoordinateCenter
         {
-            get { return (GeoCoordinate) GetValue(GeoCoordinateCenterProperty); }
+            get { return (GeoCoordinate)GetValue(GeoCoordinateCenterProperty); }
             set { SetValue(GeoCoordinateCenterProperty, value); }
         }
 
         #endregion
 
         public static readonly DependencyProperty LevelOfDetailsProperty =
-            DependencyProperty.Register("LevelOfDetails", typeof (int), typeof (MapsControl), new PropertyMetadata(default(int), OnLevelOfDetailsPropertyChanged));
+            DependencyProperty.Register("LevelOfDetails", typeof(int), typeof(MapsControl), new PropertyMetadata(default(int), OnLevelOfDetailsPropertyChanged));
 
         public int LevelOfDetails
         {
-            get { return (int) GetValue(LevelOfDetailsProperty); }
+            get { return (int)GetValue(LevelOfDetailsProperty); }
             set { SetValue(LevelOfDetailsProperty, value); }
         }
 
@@ -65,28 +50,41 @@ namespace MapsControl
         private readonly ITileElementBuilder _tileElementBuilder;
         private readonly IList<UIElement> _tileElements = new List<UIElement>();
         private readonly TranslateTransform _translateTransform = new TranslateTransform();
+        private Canvas _canvas;
         private Size _windowSize = new Size();
 
         public MapsControl()
         {
-            InitializeComponent();
+            DefaultStyleKey = typeof(MapsControl);
+            MapElements = new List<UIElement>();
 
             _tileController = new TileControllerBuilder().Build();
             _tileElementBuilder = new ImageTileElementBuilder(_tileController);
 
-            foreach (var tile in _tileController.Tiles)
-            {
-                var tileElement = _tileElementBuilder.BuildTileElement(tile);
+            ManipulationDelta += OnManipulationDelta;
+        }
 
-                _tileElements.Add(tileElement);
-                tileElement.RenderTransform = _translateTransform;
-                PART_Canvas.Children.Add(tileElement);
-            }
+        private void OnManipulationDelta(object sender, ManipulationDeltaEventArgs args)
+        {
+            int dragOffsetX = (int)args.DeltaManipulation.Translation.X;
+            int dragOffsetY = (int)args.DeltaManipulation.Translation.Y;
+
+            _tileController.Move(dragOffsetX, dragOffsetY);
+            RedrawMap();
+        }
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            _canvas = (Canvas)GetTemplateChild("PART_Canvas");
+
+            BuildTiles();
+            RedrawMap();
         }
 
         private static void OnGeoCoordinateCenterPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
         {
-            var mapsControl = (MapsControl) dependencyObject;
+            var mapsControl = (MapsControl)dependencyObject;
             mapsControl.SetGeoCoordinateCenter((GeoCoordinate)args.NewValue);
         }
 
@@ -100,11 +98,25 @@ namespace MapsControl
         {
             _windowSize = arrangeBounds;
             PositionTileWindow();
-            PART_Canvas.Clip = new RectangleGeometry
-                {
-                    Rect = new Rect(0, 0, arrangeBounds.Width, arrangeBounds.Height)
-                };
+            _canvas.Clip = new RectangleGeometry
+            {
+                Rect = new Rect(0, 0, arrangeBounds.Width, arrangeBounds.Height)
+            };
             return base.ArrangeOverride(arrangeBounds);
+        }
+
+        public List<UIElement> MapElements { get; private set; }
+
+        private void BuildTiles()
+        {
+            foreach (var tile in _tileController.Tiles)
+            {
+                var tileElement = _tileElementBuilder.BuildTileElement(tile);
+
+                _tileElements.Add(tileElement);
+                tileElement.RenderTransform = _translateTransform;
+                _canvas.Children.Add(tileElement);
+            }
         }
 
         private void PositionTileWindow()
@@ -118,6 +130,11 @@ namespace MapsControl
 
         private void UpdateTiles()
         {
+            if (!_tileElements.Any())
+            {
+                return;
+            }
+
             for (int j = 0; j < _tileController.Tiles.Count(); ++j)
             {
                 var tile = _tileController.Tiles.ElementAt(j);
@@ -142,34 +159,6 @@ namespace MapsControl
         {
             _tileController.LevelOfDetail = levelOfDetail;
             RedrawMap();
-        }
-
-        private void OnDragDelta(object sender, DragDeltaGestureEventArgs e)
-        {
-            int dragOffsetX = (int)e.HorizontalChange;
-            int dragOffsetY = (int)e.VerticalChange;
-
-            _tileController.Move(dragOffsetX, dragOffsetY);
-            RedrawMap();
-        }
-
-        private void OnDragStarted(object sender, DragStartedGestureEventArgs e)
-        {
-        }
-
-        private void OnDragCompleted(object sender, DragCompletedGestureEventArgs e)
-        {
-        }
-
-        private void OnPinchDelta(object sender, PinchGestureEventArgs e)
-        {
-//            if (_tileController.LevelOfDetail > 17)
-//            {
-//                return;
-//            }
-//
-//            _tileController.LevelOfDetail = (int)(_tileController.LevelOfDetail*(e.DistanceRatio/10));
-//            RedrawMap();
         }
     }
 }
