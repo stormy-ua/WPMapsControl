@@ -7,9 +7,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="mapsControl:MapsControl">
-                    <Canvas x:Name="PART_Canvas">
-                        
-                    </Canvas>
+                    <Canvas x:Name="PART_Canvas"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

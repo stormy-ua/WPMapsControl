@@ -20,7 +20,8 @@ namespace MapsControl.Engine
         private readonly int _tileResolution;
         private readonly int _tileSize;
         private readonly IList<Tile> _tiles = new List<Tile>();
-        private Point _tileWindowCenter = new Point();
+        private Point _tileWindowCenter;
+        private Point _pixelCenter;
         private GeoCoordinate _geoCoordinateCenter;
         private int _levelOfDetail = 14;
 
@@ -108,6 +109,8 @@ namespace MapsControl.Engine
                 }
             }
 
+            _pixelCenter.X = pixelX;
+            _pixelCenter.Y = pixelY;
             int tilePixelX = pixelX % _tileSize;
             int tilePixelY = pixelY % _tileSize;
 
@@ -142,6 +145,17 @@ namespace MapsControl.Engine
 
             var geoCoordinate = new GeoCoordinate(newCenterLatitute, newCenterLongitude);
             SetGeoCoordinateCenter(geoCoordinate);
+        }
+
+        public Point GetOffsetInPixelsRelativeToCenter(GeoCoordinate geoCoordinate)
+        {
+            int pixelY;
+            int pixelX;
+
+            _mapMath.LatLongToPixelXY(geoCoordinate.Latitude, geoCoordinate.Longitude, _levelOfDetail, out pixelX, out pixelY);
+
+            var offset = new Point(pixelX - _pixelCenter.X, pixelY - _pixelCenter.Y);
+            return offset;
         }
 
         #endregion

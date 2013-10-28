@@ -49,10 +49,12 @@
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
             <mapsControl:MapsControl x:Name="Map" 
-                                     GeoCoordinateCenter="50.39456,30.597448"
+                                     GeoCoordinateCenter="50.39456,30.5978478"
                                      LevelOfDetails="15">
-                <Ellipse Width="10" Height="10"/>
-                <Ellipse Width="10" Height="10"/>
+                <Path x:Name="Marker" Stroke="Red" Data="M 0,50 0,0 30,0 30,25 10,25 3,50 Z" Fill="Red"
+                      mapsControl:MapsControl.GeoPosition="{Binding GeoCoordinateCenter, ElementName=Map}"
+                      Width="30"
+                      Height="50"/>               
             </mapsControl:MapsControl>
             <Button Content="+" Width="80" Height="80" Background="Black"
                     VerticalAlignment="Top" HorizontalAlignment="Left"

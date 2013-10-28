@@ -14,5 +14,6 @@ namespace MapsControl.Engine
         int LevelOfDetail { get; set; }
         void SetGeoCoordinateCenter(GeoCoordinate geoCoordinate);
         void Move(int deltaPixelX, int deltaPixelY);
+        Point GetOffsetInPixelsRelativeToCenter(GeoCoordinate geoCoordinate);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Device.Location;
+using System.Windows;
 using Microsoft.Phone.Controls;
 
 namespace SampleApp
@@ -12,6 +13,10 @@ namespace SampleApp
 
             // Sample code to localize the ApplicationBar
             //BuildLocalizedApplicationBar();
+
+//            GeoCoordinateWatcher geoCoordinateWatcher = new GeoCoordinateWatcher();
+//            geoCoordinateWatcher.PositionChanged +=
+//                (sender, args) => MapsControl.MapsControl.SetGeoPosition(Marker, args.Position.Location);
         }
 
         // Sample code for building a localized ApplicationBar
