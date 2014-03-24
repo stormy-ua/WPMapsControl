@@ -90,6 +90,11 @@ namespace MapsControl.Engine
 
         private void PositionTiles()
         {
+            if (_geoCoordinateCenter == null)
+            {
+                return;
+            }
+
             int pixelY;
             int pixelX;
 

@@ -49,6 +49,12 @@ namespace MapsControl
             set { SetValue(GeoCoordinateCenterProperty, value); }
         }
 
+        private static void OnGeoCoordinateCenterPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
+        {
+            var mapsControl = (MapsControl)dependencyObject;
+            mapsControl.SetGeoCoordinateCenter((GeoCoordinate)args.NewValue);
+        }
+
         #endregion
 
         #region LevelOfDetails Property
@@ -61,6 +67,12 @@ namespace MapsControl
         {
             get { return (int) GetValue(LevelOfDetailsProperty); }
             set { SetValue(LevelOfDetailsProperty, value); }
+        }
+
+        private static void OnLevelOfDetailsPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
+        {
+            var mapsControl = (MapsControl)dependencyObject;
+            mapsControl.SetLevelOfDetail((int)args.NewValue);
         }
 
         #endregion
@@ -80,6 +92,20 @@ namespace MapsControl
         public static GeoCoordinate GetGeoPosition(UIElement element)
         {
             return (GeoCoordinate) element.GetValue(GeoPositionProperty);
+        }
+
+        private static void OnGeoPositionPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
+        {
+            var element = (FrameworkElement)dependencyObject;
+            var geoCoordinate = (GeoCoordinate)args.NewValue;
+            var mapsControl = GetMap(element);
+
+            if (mapsControl == null)
+            {
+                return;
+            }
+
+            mapsControl.PositionMapElement(element, geoCoordinate);
         }
 
         #endregion
@@ -136,57 +162,16 @@ namespace MapsControl
 
         #endregion
 
-        private void OnManipulationDelta(object sender, ManipulationDeltaEventArgs args)
-        {
-            int dragOffsetX = (int)args.DeltaManipulation.Translation.X;
-            int dragOffsetY = (int)args.DeltaManipulation.Translation.Y;
-
-            _tileController.Move(dragOffsetX, dragOffsetY);
-            //_tileController.LevelOfDetail = (int)(_tileController.LevelOfDetail * (args.DeltaManipulation.Scale.X/10));
-            RedrawMap();
-        }
-
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
             _canvas = (Canvas)GetTemplateChild("PART_Canvas");
         }
 
-        private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
-        {
-            BuildTiles();
-            RedrawMap();
-        }
-
-        private static void OnGeoCoordinateCenterPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
-        {
-            var mapsControl = (MapsControl)dependencyObject;
-            mapsControl.SetGeoCoordinateCenter((GeoCoordinate)args.NewValue);
-        }
-
-        private static void OnLevelOfDetailsPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
-        {
-            var mapsControl = (MapsControl)dependencyObject;
-            mapsControl.SetLevelOfDetail((int)args.NewValue);
-        }
-
-        private static void OnGeoPositionPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
-        {
-            var element = (FrameworkElement) dependencyObject;
-            var geoCoordinate = (GeoCoordinate)args.NewValue;
-            var mapsControl = GetMap(element);
-
-            if (mapsControl == null)
-            {
-                return;
-            }
-
-            mapsControl.PositionMapElement(element, geoCoordinate);
-        }
-
         protected override Size ArrangeOverride(Size arrangeBounds)
         {
             _windowSize = arrangeBounds;
+
             _canvas.Clip = new RectangleGeometry
             {
                 Rect = new Rect(0, 0, _windowSize.Width, _windowSize.Height)
@@ -194,7 +179,7 @@ namespace MapsControl
             return base.ArrangeOverride(arrangeBounds);
         }
 
-        private void BuildTiles()
+        private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
             foreach (var tile in _tileController.Tiles)
             {
@@ -204,6 +189,18 @@ namespace MapsControl
                 tileElement.RenderTransform = _translateTransform;
                 _canvas.Children.Add(tileElement);
             }
+
+            RedrawMap();
+        }
+
+        private void OnManipulationDelta(object sender, ManipulationDeltaEventArgs args)
+        {
+            int dragOffsetX = (int)args.DeltaManipulation.Translation.X;
+            int dragOffsetY = (int)args.DeltaManipulation.Translation.Y;
+
+            _tileController.Move(dragOffsetX, dragOffsetY);
+            //_tileController.LevelOfDetail = (int)(_tileController.LevelOfDetail * (args.DeltaManipulation.Scale.X/10));
+            RedrawMap();
         }
 
         private void PositionTileWindow()
@@ -232,6 +229,11 @@ namespace MapsControl
 
         private void UpdateMapElements()
         {
+            if (_canvas == null)
+            {
+                return;
+            }
+
             var elementsToAdd = MapElements.Where(element => !_mapElements.Contains(element)).ToArray();
 
             foreach (var element in elementsToAdd)

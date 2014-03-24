@@ -14,9 +14,25 @@ namespace SampleApp
             // Sample code to localize the ApplicationBar
             //BuildLocalizedApplicationBar();
 
-//            GeoCoordinateWatcher geoCoordinateWatcher = new GeoCoordinateWatcher();
-//            geoCoordinateWatcher.PositionChanged +=
-//                (sender, args) => MapsControl.MapsControl.SetGeoPosition(Marker, args.Position.Location);
+            Loaded += MainPage_Loaded;
+        }
+
+        private void MainPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            var geoCoordinateWatcher = new GeoCoordinateWatcher(GeoPositionAccuracy.Default);
+            geoCoordinateWatcher.MovementThreshold = 1;
+            geoCoordinateWatcher.PositionChanged +=
+                (s, args) =>
+                {
+                    if (Marker == null)
+                    {
+                        return;
+                    }
+
+                    Dispatcher.BeginInvoke(() => MapsControl.MapsControl.SetGeoPosition(Marker, args.Position.Location));
+                };
+
+            geoCoordinateWatcher.Start(false);
         }
 
         // Sample code for building a localized ApplicationBar
