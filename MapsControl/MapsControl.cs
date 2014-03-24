@@ -222,6 +222,12 @@ namespace MapsControl
             for (int j = 0; j < _tileController.Tiles.Count(); ++j)
             {
                 var tile = _tileController.Tiles.ElementAt(j);
+
+                if (tile.Uri == null)
+                {
+                    continue;
+                }
+
                 var image = (Image)_tileElements[j];
                 image.Source = new BitmapImage(new Uri(tile.Uri));
             }
