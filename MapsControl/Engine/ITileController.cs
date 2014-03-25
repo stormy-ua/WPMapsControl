@@ -12,6 +12,7 @@ namespace MapsControl.Engine
         Point TileWindowCenter { get; }
         GeoCoordinate GeoCoordinateCenter { get; }
         int LevelOfDetail { get; set; }
+        ITileUriProvider TileUriProvider { get; set; }
         void SetGeoCoordinateCenter(GeoCoordinate geoCoordinate);
         void Move(int deltaPixelX, int deltaPixelY);
         Point GetOffsetInPixelsRelativeToCenter(GeoCoordinate geoCoordinate);

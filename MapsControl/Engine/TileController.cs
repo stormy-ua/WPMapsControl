@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Device.Location;
+using System.IO.IsolatedStorage;
+using System.Net;
+using System.Net.Http;
 using System.Windows;
+using MapsControl.TileUriProviders;
 
 namespace MapsControl.Engine
 {
@@ -24,6 +28,7 @@ namespace MapsControl.Engine
         private Point _pixelCenter;
         private GeoCoordinate _geoCoordinateCenter;
         private int _levelOfDetail = 14;
+        private ITileUriProvider _tileUriProvider;
 
         #endregion
 
@@ -56,6 +61,23 @@ namespace MapsControl.Engine
             }
         }
 
+        public ITileUriProvider TileUriProvider
+        {
+            get
+            {
+                return _tileUriProvider;
+            }
+            set
+            {
+                if (_tileUriProvider == value)
+                {
+                    return;
+                }
+                _tileUriProvider = value;
+                PositionTiles();
+            }
+        }
+
         #endregion
 
         #region Constructor
@@ -64,6 +86,7 @@ namespace MapsControl.Engine
         {
             _tileResolution = tileResolution;
             _tileSize = tileSize;
+            TileUriProvider = new NullTileUriProvider();
             BuildTiles();
             SetTileWindowCenter(_tileSize / 2, _tileSize / 2);
         }
@@ -110,7 +133,20 @@ namespace MapsControl.Engine
                     var tile = _tiles[y + x * _tileResolution];
                     tile.MapX = tileX + x - _tileResolution / 2;
                     tile.MapY = tileY + y - _tileResolution / 2;
-                    tile.Uri = string.Format("http://{0}.tile.opencyclemap.org/cycle/{1}/{2}/{3}.png", "a", _levelOfDetail, tile.MapX, tile.MapY);
+//
+//                    var tileUri = string.Format("http://{0}.tile.opencyclemap.org/cycle/{1}/{2}/{3}.png", "a",
+//                                                _levelOfDetail, tile.MapX, tile.MapY);
+//                    using (var isoStore = IsolatedStorageFile.GetUserStoreForApplication())
+//                    using (var isoFileStream = isoStore.CreateFile(string.Format("opencycle_{0}_{1}_{2}.png", _levelOfDetail, tile.MapX, tile.MapY)))
+//                    {
+//                        var httpClient = new HttpClient();
+//                        var stream = await httpClient.GetStreamAsync(new Uri(tileUri));
+//                        stream.CopyTo(isoFileStream);
+//                    }
+//
+//                    tile.Uri = string.Format("http://a.tile.opencyclemap.org/cycle/{zoom}/{x}/{y}.png", _levelOfDetail, tile.MapX, tile.MapY);
+
+                    tile.Uri = TileUriProvider.GetTileUri(_levelOfDetail, tile.MapX, tile.MapY);
                 }
             }
 

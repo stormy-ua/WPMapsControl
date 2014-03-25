@@ -1,4 +1,6 @@
-﻿namespace MapsControl.Engine
+﻿using System;
+
+namespace MapsControl.Engine
 {
     public class Tile
     {
@@ -6,6 +8,6 @@
         public int Y { get; set; }
         public int MapX { get; set; }
         public int MapY { get; set; }
-        public string Uri { get; set; }
+        public Uri Uri { get; set; }
     }
 }

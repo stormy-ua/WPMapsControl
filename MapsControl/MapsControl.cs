@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using MapsControl.Engine;
 using MapsControl.Rendering;
+using MapsControl.TileUriProviders;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Maps.Controls;
 
@@ -128,6 +129,34 @@ namespace MapsControl
 
         #endregion
 
+        #region TileUriProvider Property
+
+        public static readonly DependencyProperty TileUriProviderProperty =
+            DependencyProperty.Register("TileUriProvider", typeof (ITileUriProvider), typeof (MapsControl),
+            new PropertyMetadata(new NullTileUriProvider(), OnTileUriProviderPropertyChanged));
+
+        public ITileUriProvider TileUriProvider
+        {
+            get { return (ITileUriProvider) GetValue(TileUriProviderProperty); }
+            set { SetValue(TileUriProviderProperty, value); }
+        }
+
+        private static void OnTileUriProviderPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
+        {
+            var element = (FrameworkElement)dependencyObject;
+            var tileUriProvider = (ITileUriProvider)args.NewValue;
+            var mapsControl = (dependencyObject as MapsControl) ?? GetMap(element);
+
+            if (mapsControl == null)
+            {
+                return;
+            }
+
+            mapsControl.SetTileUriProvider(tileUriProvider);
+        }
+
+        #endregion
+
         #region Properties
 
         public ObservableCollection<FrameworkElement> MapElements { get; private set; }
@@ -229,7 +258,7 @@ namespace MapsControl
                 }
 
                 var image = (Image)_tileElements[j];
-                image.Source = new BitmapImage(new Uri(tile.Uri));
+                image.Source = new BitmapImage(tile.Uri);
             }
         }
 
@@ -288,6 +317,12 @@ namespace MapsControl
             double elementHeight = element.ActualHeight;
             Canvas.SetLeft(element, elementPixelX);
             Canvas.SetTop(element, elementPixelY - elementHeight);
+        }
+
+        private void SetTileUriProvider(ITileUriProvider tileUriProvider)
+        {
+            _tileController.TileUriProvider = tileUriProvider;
+            RedrawMap();
         }
     }
 }

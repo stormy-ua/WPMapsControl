@@ -1,5 +1,6 @@
 ﻿using System.Device.Location;
 using System.Windows;
+using MapsControl.TileUriProviders;
 using Microsoft.Phone.Controls;
 
 namespace SampleApp
@@ -13,6 +14,7 @@ namespace SampleApp
 
             // Sample code to localize the ApplicationBar
             //BuildLocalizedApplicationBar();
+            Map.TileUriProvider = KnownTileUriProviders.OpenCycleMap;
 
             Loaded += MainPage_Loaded;
         }
