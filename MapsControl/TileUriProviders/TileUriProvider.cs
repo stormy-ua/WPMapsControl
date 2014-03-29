@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MapsControl.Engine;
+using MapsControl.Infrastructure;
 
 namespace MapsControl.TileUriProviders
 {
@@ -28,10 +29,7 @@ namespace MapsControl.TileUriProviders
 
         public Uri GetTileUri(int levelOfDetail, int x, int y)
         {
-            string uriString = _tileUriTemplate
-                .Replace("{zoom}", levelOfDetail.ToString())
-                .Replace("{x}", x.ToString())
-                .Replace("{y}", y.ToString());
+            string uriString = _tileUriTemplate.ReplaceTileTemplates(levelOfDetail, x, y);
 
             return new Uri(uriString);
         }

@@ -84,6 +84,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Engine\ITileUriProvider.cs" />
+    <Compile Include="Infrastructure\FormattingExtensions.cs" />
+    <Compile Include="Infrastructure\IsoStorage.cs" />
     <Compile Include="MapsControl.cs" />
     <Compile Include="Rendering\BorderTileElementBuilder.cs" />
     <Compile Include="Rendering\DebugImageTileElementBuilder.cs" />
@@ -95,6 +97,7 @@
     <Compile Include="Engine\TileController.cs" />
     <Compile Include="Engine\TileControllerBuilder.cs" />
     <Compile Include="Engine\MapMath.cs" />
+    <Compile Include="TileUriProviders\IsoStorageCacheTileProvider.cs" />
     <Compile Include="TileUriProviders\KnownTileUriProviders.cs" />
     <Compile Include="TileUriProviders\NullTileUriProvider.cs" />
     <Compile Include="TileUriProviders\TileUriProvider.cs" />
