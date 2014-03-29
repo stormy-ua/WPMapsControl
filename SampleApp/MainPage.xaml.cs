@@ -14,7 +14,8 @@ namespace SampleApp
 
             // Sample code to localize the ApplicationBar
             //BuildLocalizedApplicationBar();
-            Map.TileUriProvider = new IsoStorageCacheTileProvider(KnownTileUriProviders.OpenCycleMap, "OpenCycleCache/{zoom}/{x}_{y}.png");
+            Map.TileUriProvider = KnownTileUriProviders.OpenCycleMap
+                .WithCache("OpenCycleCache/{zoom}/{x}_{y}.png");
 
             Loaded += MainPage_Loaded;
         }
