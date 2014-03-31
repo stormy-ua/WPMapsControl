@@ -27,14 +27,12 @@ namespace MapsControl.Rendering
                         DecodePixelHeight = _tileController.TileSize, 
                         DecodePixelWidth = _tileController.TileSize, 
                         DecodePixelType = DecodePixelType.Physical, 
-                        CreateOptions = BitmapCreateOptions.BackgroundCreation 
+                        CreateOptions = BitmapCreateOptions.BackgroundCreation
                     },
                     UseLayoutRounding = true,
                     UseOptimizedManipulationRouting = true,
 
                 };
-            Canvas.SetLeft(image, tile.X * _tileController.TileSize);
-            Canvas.SetTop(image, tile.Y * _tileController.TileSize);
             return image;
         }
     }

@@ -126,6 +126,13 @@ namespace MapsControl.Engine
             int tileX = (int)Math.Floor(pixelX / (double)_tileSize);
             int tileY = (int)Math.Floor(pixelY / (double)_tileSize);
 
+            _pixelCenter.X = pixelX;
+            _pixelCenter.Y = pixelY;
+            int tilePixelX = pixelX % _tileSize;
+            int tilePixelY = pixelY % _tileSize;
+
+            SetTileWindowCenter(tilePixelX, tilePixelY);
+
             for (int x = 0; x < _tileResolution; ++x)
             {
                 for (int y = 0; y < _tileResolution; ++y)
@@ -133,29 +140,9 @@ namespace MapsControl.Engine
                     var tile = _tiles[y + x * _tileResolution];
                     tile.MapX = tileX + x - _tileResolution / 2;
                     tile.MapY = tileY + y - _tileResolution / 2;
-//
-//                    var tileUri = string.Format("http://{0}.tile.opencyclemap.org/cycle/{1}/{2}/{3}.png", "a",
-//                                                _levelOfDetail, tile.MapX, tile.MapY);
-//                    using (var isoStore = IsolatedStorageFile.GetUserStoreForApplication())
-//                    using (var isoFileStream = isoStore.CreateFile(string.Format("opencycle_{0}_{1}_{2}.png", _levelOfDetail, tile.MapX, tile.MapY)))
-//                    {
-//                        var httpClient = new HttpClient();
-//                        var stream = await httpClient.GetStreamAsync(new Uri(tileUri));
-//                        stream.CopyTo(isoFileStream);
-//                    }
-//
-//                    tile.Uri = string.Format("http://a.tile.opencyclemap.org/cycle/{zoom}/{x}/{y}.png", _levelOfDetail, tile.MapX, tile.MapY);
-
                     tile.Uri = TileUriProvider.GetTileUri(_levelOfDetail, tile.MapX, tile.MapY);
                 }
             }
-
-            _pixelCenter.X = pixelX;
-            _pixelCenter.Y = pixelY;
-            int tilePixelX = pixelX % _tileSize;
-            int tilePixelY = pixelY % _tileSize;
-
-            SetTileWindowCenter(tilePixelX, tilePixelY);
         }
 
         private void SetTileWindowCenter(int tilePixelX, int tilePixelY)

@@ -31,7 +31,7 @@ namespace MapsControl
         private readonly IList<UIElement> _tileElements = new List<UIElement>();
         private readonly IList<FrameworkElement> _mapElements = new List<FrameworkElement>();
         private readonly TranslateTransform _translateTransform = new TranslateTransform();
-        private Canvas _canvas;
+        private Panel _canvas;
         private Size _windowSize = new Size();
 
         #endregion
@@ -194,7 +194,7 @@ namespace MapsControl
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            _canvas = (Canvas)GetTemplateChild("PART_Canvas");
+            _canvas = (Panel)GetTemplateChild("PART_Panel");
         }
 
         protected override Size ArrangeOverride(Size arrangeBounds)
@@ -215,7 +215,14 @@ namespace MapsControl
                 var tileElement = _tileElementBuilder.BuildTileElement(tile);
 
                 _tileElements.Add(tileElement);
-                tileElement.RenderTransform = _translateTransform;
+                var transformGroup = new TransformGroup();
+                transformGroup.Children.Add(_translateTransform);
+                transformGroup.Children.Add(new TranslateTransform
+                    {
+                        X = tile.X * _tileController.TileSize,
+                        Y = tile.Y * _tileController.TileSize
+                    });
+                tileElement.RenderTransform = transformGroup;
                 _canvas.Children.Add(tileElement);
             }
 
@@ -258,7 +265,12 @@ namespace MapsControl
                 }
 
                 var image = (Image)_tileElements[j];
-                image.Source = new BitmapImage(tile.Uri);
+                var bitmapImage = image.Source as BitmapImage;
+
+                if (bitmapImage.UriSource != tile.Uri)
+                {
+                    bitmapImage.UriSource = tile.Uri;
+                }
             }
         }
 

@@ -7,7 +7,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="mapsControl:MapsControl">
-                    <Canvas x:Name="PART_Canvas" CacheMode="BitmapCache"/>
+                    <Canvas x:Name="PART_Panel" CacheMode="BitmapCache"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
