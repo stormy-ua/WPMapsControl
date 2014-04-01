@@ -5,7 +5,7 @@ using MapsControl.Engine;
 
 namespace MapsControl.Rendering
 {
-    public class BorderTileElementBuilder : ITileElementBuilder
+    public class BorderTileElementBuilder /*: ITileElementBuilder*/
     {
         private readonly ITileController _tileController;
 
@@ -19,8 +19,6 @@ namespace MapsControl.Rendering
             var border = new Border();
             border.Width = _tileController.TileSize;
             border.Height = _tileController.TileSize;
-            Canvas.SetLeft(border, tile.X * _tileController.TileSize);
-            Canvas.SetTop(border, tile.Y * _tileController.TileSize);
 
             var grid = new Grid();
             border.Child = grid;
@@ -33,7 +31,7 @@ namespace MapsControl.Rendering
             textBlock.FontSize = 25;
             textBlock.VerticalAlignment = VerticalAlignment.Center;
             textBlock.HorizontalAlignment = HorizontalAlignment.Center;
-            textBlock.Text = string.Format("{0}, {1}", tile.X, tile.Y);
+            textBlock.Text = string.Format("{0}, {1}", tile.MapX, tile.MapY);
             textBlock.Foreground = new SolidColorBrush(Colors.Black);
             grid.Children.Add(textBlock);
             return border;

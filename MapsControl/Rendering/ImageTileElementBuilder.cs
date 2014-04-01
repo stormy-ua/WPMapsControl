@@ -6,7 +6,7 @@ using System.Windows.Media.Imaging;
 
 namespace MapsControl.Rendering
 {
-    public class ImageTileElementBuilder : ITileElementBuilder
+    public class ImageTileElementBuilder /*: ITileElementBuilder*/
     {
         private readonly ITileController _tileController;
 
@@ -15,7 +15,7 @@ namespace MapsControl.Rendering
             _tileController = tileController;
         }
 
-        public UIElement BuildTileElement(Tile tile)
+        public Image BuildTileElement(Tile tile)
         {
             var image = new Image
                 {

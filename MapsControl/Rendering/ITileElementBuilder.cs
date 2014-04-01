@@ -5,6 +5,6 @@ namespace MapsControl.Rendering
 {
     public interface ITileElementBuilder
     {
-        UIElement BuildTileElement(Tile tile);
+        ITileElementPresenter BuildTileElement(Tile tile);
     }
 }

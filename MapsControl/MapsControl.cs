@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Device.Location;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,10 +28,8 @@ namespace MapsControl
         #region Fields
 
         private readonly ITileController _tileController;
-        private readonly ITileElementBuilder _tileElementBuilder;
-        private readonly IList<UIElement> _tileElements = new List<UIElement>();
+        private readonly IList<ITileElementPresenter> _tileElements = new List<ITileElementPresenter>();
         private readonly IList<FrameworkElement> _mapElements = new List<FrameworkElement>();
-        private readonly TranslateTransform _translateTransform = new TranslateTransform();
         private Panel _canvas;
         private Size _windowSize = new Size();
 
@@ -61,19 +60,19 @@ namespace MapsControl
         #region LevelOfDetails Property
 
         public static readonly DependencyProperty LevelOfDetailsProperty =
-            DependencyProperty.Register("LevelOfDetails", typeof (int), typeof (MapsControl),
-                                        new PropertyMetadata(default(int), OnLevelOfDetailsPropertyChanged));
+            DependencyProperty.Register("LevelOfDetails", typeof (double), typeof (MapsControl),
+                                        new PropertyMetadata(default(double), OnLevelOfDetailsPropertyChanged));
 
-        public int LevelOfDetails
+        public double LevelOfDetails
         {
-            get { return (int) GetValue(LevelOfDetailsProperty); }
+            get { return (double) GetValue(LevelOfDetailsProperty); }
             set { SetValue(LevelOfDetailsProperty, value); }
         }
 
         private static void OnLevelOfDetailsPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
         {
             var mapsControl = (MapsControl)dependencyObject;
-            mapsControl.SetLevelOfDetail((int)args.NewValue);
+            mapsControl.SetLevelOfDetail((double)args.NewValue);
         }
 
         #endregion
@@ -182,9 +181,7 @@ namespace MapsControl
                     }
                 };
 
-            _tileController = new TileControllerBuilder().Build();
-            _tileElementBuilder = new ImageTileElementBuilder(_tileController);
-
+            _tileController = new TileController(5, 256);
             ManipulationDelta += OnManipulationDelta;
             Loaded += OnLoaded;
         }
@@ -200,6 +197,7 @@ namespace MapsControl
         protected override Size ArrangeOverride(Size arrangeBounds)
         {
             _windowSize = arrangeBounds;
+            _tileController.ViewWindowSize = _windowSize;
 
             _canvas.Clip = new RectangleGeometry
             {
@@ -212,18 +210,10 @@ namespace MapsControl
         {
             foreach (var tile in _tileController.Tiles)
             {
-                var tileElement = _tileElementBuilder.BuildTileElement(tile);
+                var tileElement = new ImageTileElementPresenter(_tileController.TileSize, tile);
 
                 _tileElements.Add(tileElement);
-                var transformGroup = new TransformGroup();
-                transformGroup.Children.Add(_translateTransform);
-                transformGroup.Children.Add(new TranslateTransform
-                    {
-                        X = tile.X * _tileController.TileSize,
-                        Y = tile.Y * _tileController.TileSize
-                    });
-                tileElement.RenderTransform = transformGroup;
-                _canvas.Children.Add(tileElement);
+                _canvas.Children.Add(tileElement.VisualElement);
             }
 
             RedrawMap();
@@ -234,44 +224,10 @@ namespace MapsControl
             int dragOffsetX = (int)args.DeltaManipulation.Translation.X;
             int dragOffsetY = (int)args.DeltaManipulation.Translation.Y;
 
+           // args.DeltaManipulation.Scale
+
             _tileController.Move(dragOffsetX, dragOffsetY);
-            //_tileController.LevelOfDetail = (int)(_tileController.LevelOfDetail * (args.DeltaManipulation.Scale.X/10));
             RedrawMap();
-        }
-
-        private void PositionTileWindow()
-        {
-            int deltaX = (int)((_windowSize.Width / 2) - _tileController.TileWindowCenter.X);
-            int deltaY = (int)((_windowSize.Height / 2) - _tileController.TileWindowCenter.Y);
-
-            _translateTransform.X = deltaX;
-            _translateTransform.Y = deltaY;
-        }
-
-        private void UpdateTiles()
-        {
-            if (!_tileElements.Any())
-            {
-                return;
-            }
-
-            for (int j = 0; j < _tileController.Tiles.Count(); ++j)
-            {
-                var tile = _tileController.Tiles.ElementAt(j);
-
-                if (tile.Uri == null)
-                {
-                    continue;
-                }
-
-                var image = (Image)_tileElements[j];
-                var bitmapImage = image.Source as BitmapImage;
-
-                if (bitmapImage.UriSource != tile.Uri)
-                {
-                    bitmapImage.UriSource = tile.Uri;
-                }
-            }
         }
 
         private void UpdateMapElements()
@@ -304,8 +260,6 @@ namespace MapsControl
 
         private void RedrawMap()
         {
-            PositionTileWindow();
-            UpdateTiles();
             UpdateMapElements();
         }
 
@@ -315,7 +269,7 @@ namespace MapsControl
             RedrawMap();
         }
 
-        private void SetLevelOfDetail(int levelOfDetail)
+        private void SetLevelOfDetail(double levelOfDetail)
         {
             _tileController.LevelOfDetail = levelOfDetail;
             RedrawMap();

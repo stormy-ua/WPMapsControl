@@ -9,10 +9,10 @@ namespace MapsControl.Engine
         IEnumerable<Tile> Tiles { get; }
         int TileSize { get; }
         int TileResolution { get; }
-        Point TileWindowCenter { get; }
         GeoCoordinate GeoCoordinateCenter { get; }
-        int LevelOfDetail { get; set; }
+        double LevelOfDetail { get; set; }
         ITileUriProvider TileUriProvider { get; set; }
+        Size ViewWindowSize { get; set; }
         void SetGeoCoordinateCenter(GeoCoordinate geoCoordinate);
         void Move(int deltaPixelX, int deltaPixelY);
         Point GetOffsetInPixelsRelativeToCenter(GeoCoordinate geoCoordinate);

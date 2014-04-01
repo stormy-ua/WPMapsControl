@@ -5,7 +5,7 @@ using MapsControl.Engine;
 
 namespace MapsControl.Rendering
 {
-    public class DebugImageTileElementBuilder : ITileElementBuilder
+    public class DebugImageTileElementBuilder /*: ITileElementBuilder*/
     {
         private readonly ITileController _tileController;
 
@@ -19,8 +19,6 @@ namespace MapsControl.Rendering
             var border = new Border();
             border.Width = _tileController.TileSize;
             border.Height = _tileController.TileSize;
-            Canvas.SetLeft(border, tile.X * _tileController.TileSize);
-            Canvas.SetTop(border, tile.Y * _tileController.TileSize);
             border.BorderBrush = new SolidColorBrush(Colors.Black);
             border.BorderThickness = new Thickness(1);
             border.Background = new SolidColorBrush(Colors.Red);
@@ -32,7 +30,7 @@ namespace MapsControl.Rendering
             textBlock.FontSize = 25;
             textBlock.VerticalAlignment = VerticalAlignment.Center;
             textBlock.HorizontalAlignment = HorizontalAlignment.Center;
-            textBlock.Text = string.Format("{0}, {1}", tile.X, tile.Y);
+            textBlock.Text = string.Format("{0}, {1}", tile.MapX, tile.MapY);
             textBlock.Foreground = new SolidColorBrush(Colors.Black);
 
             var image = new Image();

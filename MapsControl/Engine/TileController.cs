@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Device.Location;
 using System.IO.IsolatedStorage;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Windows;
+using System.Xml.Linq;
 using MapsControl.TileUriProviders;
+using Microsoft.Phone.Maps.Controls;
 
 namespace MapsControl.Engine
 {
@@ -24,11 +27,11 @@ namespace MapsControl.Engine
         private readonly int _tileResolution;
         private readonly int _tileSize;
         private readonly IList<Tile> _tiles = new List<Tile>();
-        private Point _tileWindowCenter;
         private Point _pixelCenter;
         private GeoCoordinate _geoCoordinateCenter;
-        private int _levelOfDetail = 14;
+        private double _levelOfDetail = 14;
         private ITileUriProvider _tileUriProvider;
+        private Size _viewWindowsSize;
 
         #endregion
 
@@ -40,11 +43,9 @@ namespace MapsControl.Engine
 
         public int TileResolution { get { return _tileResolution; } }
 
-        public Point TileWindowCenter { get { return _tileWindowCenter; } }
-
         public GeoCoordinate GeoCoordinateCenter { get { return _geoCoordinateCenter; } }
 
-        public int LevelOfDetail
+        public double LevelOfDetail
         {
             get
             {
@@ -78,6 +79,23 @@ namespace MapsControl.Engine
             }
         }
 
+        public Size ViewWindowSize
+        {
+            get
+            {
+                return _viewWindowsSize;
+            }
+            set
+            {
+                if (_viewWindowsSize == value)
+                {
+                    return;
+                }
+                _viewWindowsSize = value;
+                PositionTiles();
+            }
+        }
+
         #endregion
 
         #region Constructor
@@ -88,7 +106,6 @@ namespace MapsControl.Engine
             _tileSize = tileSize;
             TileUriProvider = new NullTileUriProvider();
             BuildTiles();
-            SetTileWindowCenter(_tileSize / 2, _tileSize / 2);
         }
 
         #endregion
@@ -97,18 +114,10 @@ namespace MapsControl.Engine
 
         private void BuildTiles()
         {
-            for (int x = 0; x < _tileResolution; ++x)
-            {
-                for (int y = 0; y < _tileResolution; ++y)
-                {
-                    var tile = new Tile
-                        {
-                            X = x,
-                            Y = y
-                        };
-                    _tiles.Add(tile);
-                }
-            }
+            Enumerable.Range(0, _tileResolution * _tileResolution)
+                .Select(index => new Tile())
+                .ToList()
+                .ForEach(_tiles.Add);
         }
 
         private void PositionTiles()
@@ -121,7 +130,7 @@ namespace MapsControl.Engine
             int pixelY;
             int pixelX;
 
-            _mapMath.LatLongToPixelXY(_geoCoordinateCenter.Latitude, _geoCoordinateCenter.Longitude, _levelOfDetail, out pixelX, out pixelY);
+            _mapMath.LatLongToPixelXY(_geoCoordinateCenter.Latitude, _geoCoordinateCenter.Longitude, (int)_levelOfDetail, out pixelX, out pixelY);
 
             int tileX = (int)Math.Floor(pixelX / (double)_tileSize);
             int tileY = (int)Math.Floor(pixelY / (double)_tileSize);
@@ -131,8 +140,6 @@ namespace MapsControl.Engine
             int tilePixelX = pixelX % _tileSize;
             int tilePixelY = pixelY % _tileSize;
 
-            SetTileWindowCenter(tilePixelX, tilePixelY);
-
             for (int x = 0; x < _tileResolution; ++x)
             {
                 for (int y = 0; y < _tileResolution; ++y)
@@ -140,16 +147,11 @@ namespace MapsControl.Engine
                     var tile = _tiles[y + x * _tileResolution];
                     tile.MapX = tileX + x - _tileResolution / 2;
                     tile.MapY = tileY + y - _tileResolution / 2;
-                    tile.Uri = TileUriProvider.GetTileUri(_levelOfDetail, tile.MapX, tile.MapY);
+                    tile.OffsetX = (x - TileResolution / 2) * TileSize - tilePixelX + _viewWindowsSize.Width / 2;
+                    tile.OffsetY = (y - TileResolution / 2) * TileSize - tilePixelY + _viewWindowsSize.Height / 2;
+                    tile.Uri = TileUriProvider.GetTileUri((int)_levelOfDetail, tile.MapX, tile.MapY);
                 }
             }
-        }
-
-        private void SetTileWindowCenter(int tilePixelX, int tilePixelY)
-        {
-            int centerPixelX = (TileResolution / 2) * TileSize + tilePixelX;
-            int centerPixelY = (TileResolution / 2) * TileSize + tilePixelY;
-            _tileWindowCenter = new Point(centerPixelX, centerPixelY);
         }
 
         public void SetGeoCoordinateCenter(GeoCoordinate geoCoordinate)
@@ -162,17 +164,59 @@ namespace MapsControl.Engine
         {
             int centerPixelX;
             int centerPixelY;
-            _mapMath.LatLongToPixelXY(GeoCoordinateCenter.Latitude, GeoCoordinateCenter.Longitude, LevelOfDetail, out centerPixelX, out centerPixelY);
+            _mapMath.LatLongToPixelXY(GeoCoordinateCenter.Latitude, GeoCoordinateCenter.Longitude, (int)LevelOfDetail, out centerPixelX, out centerPixelY);
 
             centerPixelX -= deltaPixelX;
             centerPixelY -= deltaPixelY;
 
+            _pixelCenter.X = centerPixelX;
+            _pixelCenter.Y = centerPixelY;
+
             double newCenterLatitute;
             double newCenterLongitude;
-            _mapMath.PixelXYToLatLong(centerPixelX, centerPixelY, LevelOfDetail, out newCenterLatitute, out newCenterLongitude);
+            _mapMath.PixelXYToLatLong(centerPixelX, centerPixelY, (int)LevelOfDetail, out newCenterLatitute, out newCenterLongitude);
 
             var geoCoordinate = new GeoCoordinate(newCenterLatitute, newCenterLongitude);
-            SetGeoCoordinateCenter(geoCoordinate);
+            _geoCoordinateCenter = geoCoordinate;
+            MoveTiles(deltaPixelX, deltaPixelY);
+            //SetGeoCoordinateCenter(geoCoordinate);
+        }
+
+        private void MoveTiles(int deltaPixelX, int deltaPixelY)
+        {
+            double minOffset = -1 * _tileSize;
+            double maxOffset = _tileSize * (_tileResolution - 1);
+
+            foreach (var tile in _tiles)
+            {
+                tile.OffsetX += deltaPixelX;
+                tile.OffsetY += deltaPixelY;
+
+                if (tile.OffsetX < minOffset)
+                {
+                    tile.OffsetX += _tileResolution * _tileSize;
+                    tile.MapX += _tileResolution;
+                    tile.Uri = TileUriProvider.GetTileUri((int)_levelOfDetail, tile.MapX, tile.MapY);
+                }
+                else if (tile.OffsetX > maxOffset)
+                {
+                    tile.OffsetX -= _tileResolution * _tileSize;
+                    tile.MapX -= _tileResolution;
+                    tile.Uri = TileUriProvider.GetTileUri((int)_levelOfDetail, tile.MapX, tile.MapY);
+                }
+                else if (tile.OffsetY < minOffset)
+                {
+                    tile.OffsetY += _tileResolution * _tileSize;
+                    tile.MapY += _tileResolution;
+                    tile.Uri = TileUriProvider.GetTileUri((int)_levelOfDetail, tile.MapX, tile.MapY);
+                }
+                else if (tile.OffsetY > maxOffset)
+                {
+                    tile.OffsetY -= _tileResolution * _tileSize;
+                    tile.MapY -= _tileResolution;
+                    tile.Uri = TileUriProvider.GetTileUri((int)_levelOfDetail, tile.MapX, tile.MapY);
+                }
+            }
         }
 
         public Point GetOffsetInPixelsRelativeToCenter(GeoCoordinate geoCoordinate)
@@ -180,7 +224,7 @@ namespace MapsControl.Engine
             int pixelY;
             int pixelX;
 
-            _mapMath.LatLongToPixelXY(geoCoordinate.Latitude, geoCoordinate.Longitude, _levelOfDetail, out pixelX, out pixelY);
+            _mapMath.LatLongToPixelXY(geoCoordinate.Latitude, geoCoordinate.Longitude, (int)_levelOfDetail, out pixelX, out pixelY);
 
             var offset = new Point(pixelX - _pixelCenter.X, pixelY - _pixelCenter.Y);
             return offset;
