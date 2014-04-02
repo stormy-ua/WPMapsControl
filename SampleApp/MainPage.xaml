@@ -7,7 +7,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mapsControl="clr-namespace:MapsControl;assembly=MapsControl"
-    xmlns:tileUriProviders="clr-namespace:MapsControl.TileUriProviders;assembly=MapsControl"
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
@@ -17,10 +16,7 @@
 
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+
 
         <!-- LOCALIZATION NOTE:
             To localize the displayed strings copy their values to appropriately named
@@ -41,14 +37,8 @@
             CurrentUICulture of the app at run time.
          -->
 
-        <!--TitlePanel contains the name of the application and page title-->
-        <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,17,0,28">
-            <TextBlock Text="SAMPLE APPLICATION" Style="{StaticResource PhoneTextNormalStyle}" Margin="12,0"/>
-            <TextBlock Text="Maps Control" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
-        </StackPanel>
-
         <!--ContentPanel - place additional content here-->
-        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
+        <Grid x:Name="ContentPanel" Margin="12,0,12,0">
             <mapsControl:MapsControl x:Name="Map" 
                                      GeoCoordinateCenter="50.39456,30.5978478"
                                      LevelOfDetails="15">
@@ -57,14 +47,15 @@
                       Width="30"
                       Height="50"/>               
             </mapsControl:MapsControl>
-            <Button Content="+" Width="80" Height="80" Background="Black"
-                    VerticalAlignment="Top" HorizontalAlignment="Left"
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                <Button Content="+" Width="80" Height="80" Background="Black"
+                        Margin="3"
                     Click="ZoomInButtonOnClick"/>
 
-            <Button Content="-" Width="80" Height="80" Background="Black"
-                    VerticalAlignment="Top" HorizontalAlignment="Left"
-                    Margin="80 0 0 0"
+                <Button Content="-" Width="80" Height="80" Background="Black"
+                    Margin="3"
                     Click="ZoomOutButtonOnClick"/>
+            </StackPanel>
         </Grid>
 
         <!--Uncomment to see an alignment grid to help ensure your controls are
