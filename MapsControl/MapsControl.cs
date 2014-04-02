@@ -15,6 +15,7 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using MapsControl.Engine;
+using MapsControl.Presentation;
 using MapsControl.Rendering;
 using MapsControl.TileUriProviders;
 using Microsoft.Phone.Controls;
@@ -28,7 +29,7 @@ namespace MapsControl
         #region Fields
 
         private readonly ITileController _tileController;
-        private readonly IList<ITileElementPresenter> _tileElements = new List<ITileElementPresenter>();
+        private readonly IList<ITilePresenter> _tileElements = new List<ITilePresenter>();
         private readonly IList<FrameworkElement> _mapElements = new List<FrameworkElement>();
         private Panel _canvas;
         private Size _windowSize = new Size();
@@ -210,10 +211,11 @@ namespace MapsControl
         {
             foreach (var tile in _tileController.Tiles)
             {
-                var tileElement = new ImageTileElementPresenter(_tileController.TileSize, tile);
+                var tileView = new ImageTileView(_tileController.TileSize);
+                var tileElement = new TilePresenter(tileView, tile);
 
                 _tileElements.Add(tileElement);
-                _canvas.Children.Add(tileElement.VisualElement);
+                _canvas.Children.Add(tileView.VisualRoot);
             }
 
             RedrawMap();
