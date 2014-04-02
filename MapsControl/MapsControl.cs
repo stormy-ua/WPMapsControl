@@ -223,12 +223,7 @@ namespace MapsControl
 
         private void OnManipulationDelta(object sender, ManipulationDeltaEventArgs args)
         {
-            int dragOffsetX = (int)args.DeltaManipulation.Translation.X;
-            int dragOffsetY = (int)args.DeltaManipulation.Translation.Y;
-
-           // args.DeltaManipulation.Scale
-
-            _tileController.Move(dragOffsetX, dragOffsetY);
+            _tileController.Move(args.DeltaManipulation.Translation.ToPoint2D());
             RedrawMap();
         }
 
@@ -279,7 +274,7 @@ namespace MapsControl
 
         private void PositionMapElement(FrameworkElement element, GeoCoordinate geoCoordinate)
         {
-            Point offset = _tileController.GetOffsetInPixelsRelativeToCenter(geoCoordinate);
+            Point2D offset = _tileController.GeoCoordinateCenter.DistanceInPixelsTo(geoCoordinate, _tileController.LevelOfDetail);
             double elementPixelX = _windowSize.Width / 2 + offset.X;
             double elementPixelY = _windowSize.Height / 2 + offset.Y;
             double elementHeight = element.ActualHeight;

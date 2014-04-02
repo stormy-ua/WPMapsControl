@@ -23,11 +23,9 @@ namespace MapsControl.Engine
 
         #region Fields
 
-        private readonly MapMath _mapMath = new MapMath();
         private readonly int _tileResolution;
         private readonly int _tileSize;
         private readonly IList<Tile> _tiles = new List<Tile>();
-        private Point _pixelCenter;
         private GeoCoordinate _geoCoordinateCenter;
         private double _levelOfDetail = 14;
         private ITileUriProvider _tileUriProvider;
@@ -127,28 +125,18 @@ namespace MapsControl.Engine
                 return;
             }
 
-            int pixelY;
-            int pixelX;
-
-            _mapMath.LatLongToPixelXY(_geoCoordinateCenter.Latitude, _geoCoordinateCenter.Longitude, (int)_levelOfDetail, out pixelX, out pixelY);
-
-            int tileX = (int)Math.Floor(pixelX / (double)_tileSize);
-            int tileY = (int)Math.Floor(pixelY / (double)_tileSize);
-
-            _pixelCenter.X = pixelX;
-            _pixelCenter.Y = pixelY;
-            int tilePixelX = pixelX % _tileSize;
-            int tilePixelY = pixelY % _tileSize;
+            Point2D pointInTileIndexes = _geoCoordinateCenter.ToPointInTileIndexes(_levelOfDetail, _tileSize);
+            Point2D pointInTileRelativePixels = _geoCoordinateCenter.ToPointInTileRelativePixels(_levelOfDetail, _tileSize);
 
             for (int x = 0; x < _tileResolution; ++x)
             {
                 for (int y = 0; y < _tileResolution; ++y)
                 {
                     var tile = _tiles[y + x * _tileResolution];
-                    tile.MapX = tileX + x - _tileResolution / 2;
-                    tile.MapY = tileY + y - _tileResolution / 2;
-                    tile.OffsetX = (x - TileResolution / 2) * TileSize - tilePixelX + _viewWindowsSize.Width / 2;
-                    tile.OffsetY = (y - TileResolution / 2) * TileSize - tilePixelY + _viewWindowsSize.Height / 2;
+                    tile.MapX = pointInTileIndexes.X + x - _tileResolution / 2;
+                    tile.MapY = pointInTileIndexes.Y + y - _tileResolution / 2;
+                    tile.OffsetX = (x - TileResolution / 2) * TileSize - pointInTileRelativePixels.X + _viewWindowsSize.Width / 2;
+                    tile.OffsetY = (y - TileResolution / 2) * TileSize - pointInTileRelativePixels.Y + _viewWindowsSize.Height / 2;
                     tile.Uri = TileUriProvider.GetTileUri((int)_levelOfDetail, tile.MapX, tile.MapY);
                 }
             }
@@ -160,37 +148,21 @@ namespace MapsControl.Engine
             PositionTiles();
         }
 
-        public void Move(int deltaPixelX, int deltaPixelY)
+        public void Move(Point2D offset)
         {
-            int centerPixelX;
-            int centerPixelY;
-            _mapMath.LatLongToPixelXY(GeoCoordinateCenter.Latitude, GeoCoordinateCenter.Longitude, (int)LevelOfDetail, out centerPixelX, out centerPixelY);
-
-            centerPixelX -= deltaPixelX;
-            centerPixelY -= deltaPixelY;
-
-            _pixelCenter.X = centerPixelX;
-            _pixelCenter.Y = centerPixelY;
-
-            double newCenterLatitute;
-            double newCenterLongitude;
-            _mapMath.PixelXYToLatLong(centerPixelX, centerPixelY, (int)LevelOfDetail, out newCenterLatitute, out newCenterLongitude);
-
-            var geoCoordinate = new GeoCoordinate(newCenterLatitute, newCenterLongitude);
-            _geoCoordinateCenter = geoCoordinate;
-            MoveTiles(deltaPixelX, deltaPixelY);
-            //SetGeoCoordinateCenter(geoCoordinate);
+            _geoCoordinateCenter = _geoCoordinateCenter.OffsetByPixels(offset, _levelOfDetail);
+            MoveTiles(offset);
         }
 
-        private void MoveTiles(int deltaPixelX, int deltaPixelY)
+        private void MoveTiles(Point2D offset)
         {
             double minOffset = -1 * _tileSize;
             double maxOffset = _tileSize * (_tileResolution - 1);
 
             foreach (var tile in _tiles)
             {
-                tile.OffsetX += deltaPixelX;
-                tile.OffsetY += deltaPixelY;
+                tile.OffsetX += offset.X;
+                tile.OffsetY += offset.Y;
 
                 if (tile.OffsetX < minOffset)
                 {
@@ -217,17 +189,6 @@ namespace MapsControl.Engine
                     tile.Uri = TileUriProvider.GetTileUri((int)_levelOfDetail, tile.MapX, tile.MapY);
                 }
             }
-        }
-
-        public Point GetOffsetInPixelsRelativeToCenter(GeoCoordinate geoCoordinate)
-        {
-            int pixelY;
-            int pixelX;
-
-            _mapMath.LatLongToPixelXY(geoCoordinate.Latitude, geoCoordinate.Longitude, (int)_levelOfDetail, out pixelX, out pixelY);
-
-            var offset = new Point(pixelX - _pixelCenter.X, pixelY - _pixelCenter.Y);
-            return offset;
         }
 
         #endregion

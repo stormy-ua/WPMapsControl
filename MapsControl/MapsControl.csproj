@@ -85,7 +85,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Engine\GeoMathExtensions.cs" />
     <Compile Include="Engine\ITileUriProvider.cs" />
+    <Compile Include="Engine\Point2D.cs" />
+    <Compile Include="Engine\Point2DExtensions.cs" />
     <Compile Include="Infrastructure\FormattingExtensions.cs" />
     <Compile Include="Infrastructure\IsoStorage.cs" />
     <Compile Include="MapsControl.cs" />

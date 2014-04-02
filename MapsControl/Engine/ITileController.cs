@@ -14,7 +14,6 @@ namespace MapsControl.Engine
         ITileUriProvider TileUriProvider { get; set; }
         Size ViewWindowSize { get; set; }
         void SetGeoCoordinateCenter(GeoCoordinate geoCoordinate);
-        void Move(int deltaPixelX, int deltaPixelY);
-        Point GetOffsetInPixelsRelativeToCenter(GeoCoordinate geoCoordinate);
+        void Move(Point2D offset);
     }
 }
