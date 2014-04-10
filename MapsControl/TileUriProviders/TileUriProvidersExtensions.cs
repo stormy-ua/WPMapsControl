@@ -11,7 +11,7 @@ namespace MapsControl.TileUriProviders
     {
         public static ITileUriProvider WithCache(this ITileUriProvider tileUriProvider, string cacheTilePathTemplate)
         {
-            return new IsoStorageCacheTileProvider(KnownTileUriProviders.OpenCycleMap, cacheTilePathTemplate);            
+            return new IsoStorageCacheTileProvider(tileUriProvider, cacheTilePathTemplate);            
         }
     }
 }

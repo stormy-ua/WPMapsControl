@@ -4,6 +4,7 @@ using System.Device.Location;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace MapsControl.Engine
 {
@@ -60,6 +61,17 @@ namespace MapsControl.Engine
             pointInAbsolutePixels.Y -= offset.Y;
 
             return pointInAbsolutePixels.AbsolutePixelsToGeoCoordinate(levelOfDetail);
+        }
+
+        public static Point2D ToWindowPoint(
+            this GeoCoordinate geoCoordinate, GeoCoordinate centerGeoCoordinate, double levelOfDetail, Size windowSize)
+        {
+            Point2D centerPointInTileAbsolutePixels = centerGeoCoordinate.ToPointInAbsolutePixels(levelOfDetail);
+            Point2D pinAbsoluteInPixels = geoCoordinate.ToPointInAbsolutePixels(levelOfDetail);
+            Point2D distanceToCenterInPixels = centerPointInTileAbsolutePixels.Distance(pinAbsoluteInPixels);
+            return new Point2D(
+                distanceToCenterInPixels.X + (int)(windowSize.Width / 2),
+                distanceToCenterInPixels.Y + (int)(windowSize.Height / 2));
         }
     }
 }

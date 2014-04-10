@@ -18,5 +18,10 @@ namespace MapsControl.Engine
         {
             return new Point2D(point.X + offset.X, point.Y + offset.Y);
         }
+
+        public static Point2D Distance(this Point2D first, Point2D second)
+        {
+            return new Point2D(second.X - first.X, second.Y - first.Y);
+        }
     }
 }

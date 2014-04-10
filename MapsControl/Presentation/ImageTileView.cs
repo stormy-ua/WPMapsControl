@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -11,42 +10,13 @@ using MapsControl.Engine;
 
 namespace MapsControl.Presentation
 {
-    public class ImageTileView : ITileView
+    public class ImageTileView : FrameworkElementView, ITileView
     {
-        #region Fields
-
-        private readonly int _tileSize;
-        private readonly Image _visualElement;
-
-        #endregion
-
         #region Properties
-
-        private TranslateTransform TranslateTransform
-        {
-            get { return (TranslateTransform)_visualElement.RenderTransform; }
-        }
 
         private BitmapImage Bitmap
         {
-            get { return (BitmapImage)_visualElement.Source; }
-        }
-
-        public UIElement VisualRoot
-        {
-            get { return _visualElement; }
-        }
-
-        public double OffsetX
-        {
-            get { return TranslateTransform.X; }
-            set { TranslateTransform.X = value; }
-        }
-
-        public double OffsetY
-        {
-            get { return TranslateTransform.Y; }
-            set { TranslateTransform.Y = value; }
+            get { return (BitmapImage)((Image)_visualElement).Source; }
         }
 
         public Uri Uri
@@ -71,26 +41,25 @@ namespace MapsControl.Presentation
         #region Constructors
 
         public ImageTileView(int tileSize)
+            : base(CreateImage(tileSize))
         {
-            _tileSize = tileSize;
-            _visualElement = CreateImage();
         }
 
         #endregion
 
         #region Methods
 
-        private Image CreateImage()
+        private static Image CreateImage(int tileSize)
         {
             var image = new Image
             {
-                Width = _tileSize,
-                Height = _tileSize,
+                Width = tileSize,
+                Height = tileSize,
                 CacheMode = new BitmapCache(),
                 Source = new BitmapImage
                 {
-                    DecodePixelHeight = _tileSize,
-                    DecodePixelWidth = _tileSize,
+                    DecodePixelHeight = tileSize,
+                    DecodePixelWidth = tileSize,
                     DecodePixelType = DecodePixelType.Physical,
                     CreateOptions = BitmapCreateOptions.BackgroundCreation
                 },

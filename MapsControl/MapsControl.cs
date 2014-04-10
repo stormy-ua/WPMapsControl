@@ -16,7 +16,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using MapsControl.Engine;
 using MapsControl.Presentation;
-using MapsControl.Rendering;
 using MapsControl.TileUriProviders;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Maps.Controls;
@@ -28,11 +27,12 @@ namespace MapsControl
     {
         #region Fields
 
-        private readonly ITileController _tileController;
-        private readonly IList<ITilePresenter> _tileElements = new List<ITilePresenter>();
-        private readonly IList<FrameworkElement> _mapElements = new List<FrameworkElement>();
+        private readonly IMapController _mapController;
+        private readonly IList<TilePresenter> _tileElements = new List<TilePresenter>();
+        private readonly IList<MapEntityPresenter> _mapEntityPresenters = 
+            new List<MapEntityPresenter>();
         private Panel _canvas;
-        private Size _windowSize = new Size();
+        private Size _windowSize;
 
         #endregion
 
@@ -143,9 +143,8 @@ namespace MapsControl
 
         private static void OnTileUriProviderPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
         {
-            var element = (FrameworkElement)dependencyObject;
             var tileUriProvider = (ITileUriProvider)args.NewValue;
-            var mapsControl = (dependencyObject as MapsControl) ?? GetMap(element);
+            var mapsControl = dependencyObject as MapsControl;
 
             if (mapsControl == null)
             {
@@ -176,13 +175,13 @@ namespace MapsControl
                         return;
                     }
 
-                    foreach (var mapElement in args.NewItems.OfType<UIElement>())
+                    foreach (var mapElement in args.NewItems.OfType<FrameworkElement>())
                     {
                         SetMap(mapElement, this);
                     }
                 };
 
-            _tileController = new TileController(5, 256);
+            _mapController = new MapController(5, 256);
             ManipulationDelta += OnManipulationDelta;
             Loaded += OnLoaded;
         }
@@ -198,7 +197,7 @@ namespace MapsControl
         protected override Size ArrangeOverride(Size arrangeBounds)
         {
             _windowSize = arrangeBounds;
-            _tileController.ViewWindowSize = _windowSize;
+            _mapController.ViewWindowSize = _windowSize;
 
             _canvas.Clip = new RectangleGeometry
             {
@@ -209,83 +208,57 @@ namespace MapsControl
 
         private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            foreach (var tile in _tileController.Tiles)
+            foreach (var tile in _mapController.Tiles)
             {
-                var tileView = new ImageTileView(_tileController.TileSize);
+                var tileView = new ImageTileView(_mapController.TileSize);
                 var tileElement = new TilePresenter(tileView, tile);
 
                 _tileElements.Add(tileElement);
                 _canvas.Children.Add(tileView.VisualRoot);
             }
 
-            RedrawMap();
+            foreach (var mapElement in MapElements)
+            {
+                var pin = new Pin { GeoCoordinate = GetGeoPosition(mapElement) };
+                var elementView = new FrameworkElementView(mapElement);
+                var mapEntityPresenter = new PinEntityPresenter(elementView, pin);
+                
+                _mapController.AddPin(pin);
+                _mapEntityPresenters.Add(mapEntityPresenter);
+                _canvas.Children.Add(elementView.VisualRoot);
+            }
         }
 
         private void OnManipulationDelta(object sender, ManipulationDeltaEventArgs args)
         {
-            _tileController.Move(args.DeltaManipulation.Translation.ToPoint2D());
-            RedrawMap();
-        }
-
-        private void UpdateMapElements()
-        {
-            if (_canvas == null)
-            {
-                return;
-            }
-
-            var elementsToAdd = MapElements.Where(element => !_mapElements.Contains(element)).ToArray();
-
-            foreach (var element in elementsToAdd)
-            {
-                _canvas.Children.Add(element);
-                _mapElements.Add(element);
-            }
-
-            foreach (var element in _mapElements)
-            {
-                GeoCoordinate geoCoordinate = GetGeoPosition(element);
-
-                if (geoCoordinate == null)
-                {
-                    continue;
-                }
-
-                PositionMapElement(element, geoCoordinate);
-            }
-        }
-
-        private void RedrawMap()
-        {
-            UpdateMapElements();
+            _mapController.Move(args.DeltaManipulation.Translation.ToPoint2D());
         }
 
         private void SetGeoCoordinateCenter(GeoCoordinate geoCoordinate)
         {
-            _tileController.SetGeoCoordinateCenter(geoCoordinate);
-            RedrawMap();
+            _mapController.SetGeoCoordinateCenter(geoCoordinate);
         }
 
         private void SetLevelOfDetail(double levelOfDetail)
         {
-            _tileController.LevelOfDetail = levelOfDetail;
-            RedrawMap();
+            _mapController.LevelOfDetail = levelOfDetail;
         }
 
         private void PositionMapElement(FrameworkElement element, GeoCoordinate geoCoordinate)
         {
-            Point2D offset = _tileController.GeoCoordinateCenter.DistanceInPixelsTo(geoCoordinate, _tileController.LevelOfDetail);
-            double elementPixelX = _windowSize.Width / 2 + offset.X;
-            double elementPixelY = _windowSize.Height / 2 + offset.Y;
-            double elementHeight = element.ActualHeight;
-            Canvas.SetLeft(element, elementPixelX);
-            Canvas.SetTop(element, elementPixelY - elementHeight);
+            var mapEntityPresenter = _mapEntityPresenters.FirstOrDefault(e => e.View.VisualRoot == element);
+
+            if (mapEntityPresenter != null && mapEntityPresenter.MapEntity is Pin)
+            {
+                var pin = (Pin) mapEntityPresenter.MapEntity;
+                pin.GeoCoordinate = geoCoordinate;
+                _mapController.PositionPin(pin);
+            }
         }
 
         private void SetTileUriProvider(ITileUriProvider tileUriProvider)
         {
-            _tileController.TileUriProvider = tileUriProvider;
-            RedrawMap();
+            _mapController.TileUriProvider = tileUriProvider;
         }
     }
 }

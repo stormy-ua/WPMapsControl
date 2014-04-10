@@ -45,7 +45,12 @@
                 <Path x:Name="Marker" Stroke="Red" Data="M 0,50 0,0 30,0 30,25 10,25 3,50 Z" Fill="Red"
                       mapsControl:MapsControl.GeoPosition="{Binding GeoCoordinateCenter, ElementName=Map}"
                       Width="30"
-                      Height="50"/>               
+                      Height="50">
+                    <Path.RenderTransform>
+                        <TranslateTransform/>
+                    </Path.RenderTransform>
+                </Path>
+
             </mapsControl:MapsControl>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center">
                 <Button Content="+" Width="80" Height="80" Background="Black"

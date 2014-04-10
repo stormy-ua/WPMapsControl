@@ -8,11 +8,12 @@ using System.Net.Http;
 using System.Windows;
 using System.Xml.Linq;
 using MapsControl.TileUriProviders;
+using Microsoft.Phone.Controls;
 using Microsoft.Phone.Maps.Controls;
 
 namespace MapsControl.Engine
 {
-    public class TileController : ITileController
+    public class MapController : IMapController
     {
         #region Consts
 
@@ -26,6 +27,7 @@ namespace MapsControl.Engine
         private readonly int _tileResolution;
         private readonly int _tileSize;
         private readonly IList<Tile> _tiles = new List<Tile>();
+        private readonly IList<Pin> _pins = new List<Pin>();
         private GeoCoordinate _geoCoordinateCenter;
         private double _levelOfDetail = 14;
         private ITileUriProvider _tileUriProvider;
@@ -56,7 +58,7 @@ namespace MapsControl.Engine
                     return;
                 }
                 _levelOfDetail = value;
-                PositionTiles();
+                Initialize();
             }
         }
 
@@ -73,7 +75,7 @@ namespace MapsControl.Engine
                     return;
                 }
                 _tileUriProvider = value;
-                PositionTiles();
+                Initialize();
             }
         }
 
@@ -90,7 +92,7 @@ namespace MapsControl.Engine
                     return;
                 }
                 _viewWindowsSize = value;
-                PositionTiles();
+                Initialize();
             }
         }
 
@@ -98,7 +100,7 @@ namespace MapsControl.Engine
 
         #region Constructor
 
-        public TileController(int tileResolution, int tileSize)
+        public MapController(int tileResolution, int tileSize)
         {
             _tileResolution = tileResolution;
             _tileSize = tileSize;
@@ -118,7 +120,7 @@ namespace MapsControl.Engine
                 .ForEach(_tiles.Add);
         }
 
-        private void PositionTiles()
+        private void Initialize()
         {
             if (_geoCoordinateCenter == null)
             {
@@ -127,6 +129,7 @@ namespace MapsControl.Engine
 
             Point2D pointInTileIndexes = _geoCoordinateCenter.ToPointInTileIndexes(_levelOfDetail, _tileSize);
             Point2D pointInTileRelativePixels = _geoCoordinateCenter.ToPointInTileRelativePixels(_levelOfDetail, _tileSize);
+            Point2D centerPointInTileAbsolutePixels = _geoCoordinateCenter.ToPointInAbsolutePixels(_levelOfDetail);
 
             for (int x = 0; x < _tileResolution; ++x)
             {
@@ -140,23 +143,13 @@ namespace MapsControl.Engine
                     tile.Uri = TileUriProvider.GetTileUri((int)_levelOfDetail, tile.MapX, tile.MapY);
                 }
             }
-        }
 
-        public void SetGeoCoordinateCenter(GeoCoordinate geoCoordinate)
-        {
-            _geoCoordinateCenter = geoCoordinate;
-            PositionTiles();
-        }
-
-        public void Move(Point2D offset)
-        {
-            _geoCoordinateCenter = _geoCoordinateCenter.OffsetByPixels(offset, _levelOfDetail);
-            MoveTiles(offset);
+            _pins.ToList().ForEach(PositionPin);
         }
 
         private void MoveTiles(Point2D offset)
         {
-            double minOffset = -1 * _tileSize;
+            double minOffset = -1 * _tileSize;  
             double maxOffset = _tileSize * (_tileResolution - 1);
 
             foreach (var tile in _tiles)
@@ -189,6 +182,43 @@ namespace MapsControl.Engine
                     tile.Uri = TileUriProvider.GetTileUri((int)_levelOfDetail, tile.MapX, tile.MapY);
                 }
             }
+
+            foreach (var pin in _pins)
+            {
+                pin.OffsetX += offset.X;
+                pin.OffsetY += offset.Y;
+            }
+        }
+
+        public void AddPin(Pin pin)
+        {
+            _pins.Add(pin);
+        }
+
+        public void SetGeoCoordinateCenter(GeoCoordinate geoCoordinate)
+        {
+            _geoCoordinateCenter = geoCoordinate;
+            Initialize();
+        }
+
+        public void Move(Point2D offset)
+        {
+            _geoCoordinateCenter = _geoCoordinateCenter.OffsetByPixels(offset, _levelOfDetail);
+            MoveTiles(offset);
+        }
+
+        public void PositionPin(Pin pin)
+        {
+            if (pin.GeoCoordinate == null)
+            {
+                return;
+            }
+
+            Point2D pinWindowPoint = pin.GeoCoordinate.ToWindowPoint(
+                _geoCoordinateCenter, _levelOfDetail, _viewWindowsSize);
+
+            pin.OffsetX = pinWindowPoint.X;
+            pin.OffsetY = pinWindowPoint.Y;
         }
 
         #endregion
