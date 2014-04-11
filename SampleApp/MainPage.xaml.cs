@@ -32,7 +32,7 @@ namespace SampleApp
                         return;
                     }
 
-                    Dispatcher.BeginInvoke(() => MapsControl.MapsControl.SetGeoPosition(Marker, args.Position.Location));
+                    Dispatcher.BeginInvoke(() => Marker.GeoCoordinate = args.Position.Location);
                 };
 
             geoCoordinateWatcher.Start(false);

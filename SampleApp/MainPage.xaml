@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mapsControl="clr-namespace:MapsControl;assembly=MapsControl"
+    xmlns:presentation="clr-namespace:MapsControl.Presentation;assembly=MapsControl"
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
@@ -42,15 +43,15 @@
             <mapsControl:MapsControl x:Name="Map" 
                                      GeoCoordinateCenter="50.39456,30.5978478"
                                      LevelOfDetails="15">
-                <Path x:Name="Marker" Stroke="Red" Data="M 0,50 0,0 30,0 30,25 10,25 3,50 Z" Fill="Red"
-                      mapsControl:MapsControl.GeoPosition="{Binding GeoCoordinateCenter, ElementName=Map}"
+                <presentation:MapOverlay x:Name="Marker" GeoCoordinate="50.39456,30.5978478">
+                    <Path Stroke="Red" Data="M 0,50 0,0 30,0 30,25 10,25 3,50 Z" Fill="Red"
                       Width="30"
                       Height="50">
-                    <Path.RenderTransform>
-                        <TranslateTransform/>
-                    </Path.RenderTransform>
-                </Path>
-
+                        <Path.RenderTransform>
+                            <TranslateTransform/>
+                        </Path.RenderTransform>
+                    </Path>
+                </presentation:MapOverlay>
             </mapsControl:MapsControl>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center">
                 <Button Content="+" Width="80" Height="80" Background="Black"

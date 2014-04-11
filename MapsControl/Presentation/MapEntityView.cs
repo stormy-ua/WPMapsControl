@@ -1,9 +1,12 @@
-﻿using System.Windows;
+﻿using System;
+using System.Device.Location;
+using System.Windows;
 using System.Windows.Media;
+using Microsoft.Phone.Maps.Controls;
 
 namespace MapsControl.Presentation
 {
-    public class FrameworkElementView : IMapEntityView
+    public class MapEntityView : IMapOverlayView
     {
         #region Fields
 
@@ -37,11 +40,17 @@ namespace MapsControl.Presentation
 
         #endregion
 
+        #region Events
+
+        public event EventHandler<GeoCoordinate> GeoCoordinateChanged;
+
+        #endregion
+
         #region Constructors
 
-        public FrameworkElementView(FrameworkElement visualElement)
+        public MapEntityView(FrameworkElement frameworkElement)
         {
-            _visualElement = visualElement;
+            _visualElement = frameworkElement;
         }
 
         #endregion

@@ -10,7 +10,7 @@ using MapsControl.Engine;
 
 namespace MapsControl.Presentation
 {
-    public class ImageTileView : FrameworkElementView, ITileView
+    public class ImageTileView : MapEntityView, ITileView
     {
         #region Properties
 

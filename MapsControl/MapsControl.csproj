@@ -94,8 +94,10 @@
     <Compile Include="Infrastructure\FormattingExtensions.cs" />
     <Compile Include="Infrastructure\IsoStorage.cs" />
     <Compile Include="MapsControl.cs" />
-    <Compile Include="Presentation\PinEntityPresenter.cs" />
-    <Compile Include="Presentation\FrameworkElement.cs" />
+    <Compile Include="Presentation\IMapOverlayView.cs" />
+    <Compile Include="Presentation\MapOverlay.cs" />
+    <Compile Include="Presentation\MapOverlayPresenter.cs" />
+    <Compile Include="Presentation\MapEntityView.cs" />
     <Compile Include="Presentation\ImageTileView.cs" />
     <Compile Include="Engine\IMapController.cs" />
     <Compile Include="Presentation\IMapEntityView.cs" />
