@@ -20,18 +20,17 @@ using MapsControl.TileUriProviders;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Maps.Controls;
 using MapOverlay = MapsControl.Presentation.MapOverlay;
+using MapPolyline = MapsControl.Presentation.MapPolyline;
 
 namespace MapsControl
 {
-    [ContentProperty("MapOverlays")]
+    [ContentProperty("MapElements")]
     public class MapsControl : Control
     {
         #region Fields
 
         private readonly IMapController _mapController = new MapController(5, 256);
         private readonly IList<TilePresenter> _tileElements = new List<TilePresenter>();
-        private readonly IList<MapEntityPresenter> _mapEntityPresenters = 
-            new List<MapEntityPresenter>();
         private Panel _canvas;
         private Size _windowSize;
 
@@ -54,7 +53,7 @@ namespace MapsControl
         private static void OnGeoCoordinateCenterPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
         {
             var mapsControl = (MapsControl)dependencyObject;
-            mapsControl.SetGeoCoordinateCenter((GeoCoordinate)args.NewValue);
+            mapsControl._mapController.SetGeoCoordinateCenter((GeoCoordinate)args.NewValue);
         }
 
         #endregion
@@ -74,7 +73,7 @@ namespace MapsControl
         private static void OnLevelOfDetailsPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
         {
             var mapsControl = (MapsControl)dependencyObject;
-            mapsControl.SetLevelOfDetail((double)args.NewValue);
+            mapsControl._mapController.LevelOfDetail = (double)args.NewValue;
         }
 
         #endregion
@@ -101,14 +100,14 @@ namespace MapsControl
                 return;
             }
 
-            mapsControl.SetTileUriProvider(tileUriProvider);
+            mapsControl._mapController.TileUriProvider = tileUriProvider;
         }
 
         #endregion
 
         #region Properties
 
-        public ObservableCollection<MapOverlay> MapOverlays { get; private set; }
+        public ObservableCollection<MapElement> MapElements { get; private set; }
 
         #endregion
 
@@ -117,7 +116,7 @@ namespace MapsControl
         public MapsControl()
         {
             DefaultStyleKey = typeof (MapsControl);
-            MapOverlays = new ObservableCollection<MapOverlay>();
+            MapElements = new ObservableCollection<MapElement>();
 
             ManipulationDelta += OnManipulationDelta;
             Loaded += OnLoaded;
@@ -154,35 +153,28 @@ namespace MapsControl
                 _canvas.Children.Add(tileView.VisualRoot);
             }
 
-            foreach (var mapOverlay in MapOverlays)
+            foreach (var mapOverlay in MapElements.OfType<MapOverlay>())
             {
                 var pin = new Pin { GeoCoordinate = mapOverlay.GeoCoordinate };
                 var mapEntityPresenter = new MapOverlayPresenter(_mapController, mapOverlay, pin);
 
                 _mapController.AddPin(pin);
-                _mapEntityPresenters.Add(mapEntityPresenter);
                 _canvas.Children.Add(mapOverlay.Content);
+            }
+
+            foreach (var mapPolyline in MapElements.OfType<MapPolyline>())
+            {
+                var polylineEntity = new PolylineEntity(mapPolyline.Path);
+                var polylineEntityPresenter = new PolylineEntityPresenter(_mapController, mapPolyline, polylineEntity);
+
+                _mapController.AddPolyline(polylineEntity);
+                _canvas.Children.Add(mapPolyline.VisualRoot);
             }
         }
 
         private void OnManipulationDelta(object sender, ManipulationDeltaEventArgs args)
         {
             _mapController.Move(args.DeltaManipulation.Translation.ToPoint2D());
-        }
-
-        private void SetGeoCoordinateCenter(GeoCoordinate geoCoordinate)
-        {
-            _mapController.SetGeoCoordinateCenter(geoCoordinate);
-        }
-
-        private void SetLevelOfDetail(double levelOfDetail)
-        {
-            _mapController.LevelOfDetail = levelOfDetail;
-        }
-
-        private void SetTileUriProvider(ITileUriProvider tileUriProvider)
-        {
-            _mapController.TileUriProvider = tileUriProvider;
         }
     }
 }

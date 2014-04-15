@@ -13,7 +13,7 @@ using Microsoft.Phone.Maps.Controls;
 namespace MapsControl.Presentation
 {
     [ContentProperty("Content")]
-    public class MapOverlay : DependencyObject, IMapOverlayView
+    public class MapOverlay : MapElement, IMapOverlayView
     {
         #region GeoCoordinate Property
 
@@ -94,6 +94,5 @@ namespace MapsControl.Presentation
         }
 
         #endregion
-
     }
 }

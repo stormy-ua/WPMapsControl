@@ -7,6 +7,8 @@ using System.Net;
 using System.Net.Http;
 using System.Windows;
 using System.Xml.Linq;
+using MapsControl.Infrastructure;
+using MapsControl.Presentation;
 using MapsControl.TileUriProviders;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Maps.Controls;
@@ -129,7 +131,6 @@ namespace MapsControl.Engine
 
             Point2D pointInTileIndexes = _geoCoordinateCenter.ToPointInTileIndexes(_levelOfDetail, _tileSize);
             Point2D pointInTileRelativePixels = _geoCoordinateCenter.ToPointInTileRelativePixels(_levelOfDetail, _tileSize);
-            Point2D centerPointInTileAbsolutePixels = _geoCoordinateCenter.ToPointInAbsolutePixels(_levelOfDetail);
 
             for (int x = 0; x < _tileResolution; ++x)
             {
@@ -144,7 +145,7 @@ namespace MapsControl.Engine
                 }
             }
 
-            _pins.ToList().ForEach(PositionPin);
+            _pins.ForEach(PositionPin);
         }
 
         private void MoveTiles(Point2D offset)
@@ -219,6 +220,11 @@ namespace MapsControl.Engine
 
             pin.OffsetX = pinWindowPoint.X;
             pin.OffsetY = pinWindowPoint.Y;
+        }
+
+        public void AddPolyline(PolylineEntity polylineEntity)
+        {
+            polylineEntity.Pins.ForEach(_pins.Add);
         }
 
         #endregion

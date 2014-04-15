@@ -91,10 +91,13 @@
     <Compile Include="Engine\Pin.cs" />
     <Compile Include="Engine\Point2D.cs" />
     <Compile Include="Engine\Point2DExtensions.cs" />
+    <Compile Include="Infrastructure\EnumerableExtensions.cs" />
     <Compile Include="Infrastructure\FormattingExtensions.cs" />
     <Compile Include="Infrastructure\IsoStorage.cs" />
+    <Compile Include="MapElement.cs" />
     <Compile Include="MapsControl.cs" />
     <Compile Include="Presentation\IMapOverlayView.cs" />
+    <Compile Include="Presentation\IPolylineEntityView.cs" />
     <Compile Include="Presentation\MapOverlay.cs" />
     <Compile Include="Presentation\MapOverlayPresenter.cs" />
     <Compile Include="Presentation\MapEntityView.cs" />
@@ -103,6 +106,9 @@
     <Compile Include="Presentation\IMapEntityView.cs" />
     <Compile Include="Presentation\ITileView.cs" />
     <Compile Include="Presentation\MapEntityPresenter.cs" />
+    <Compile Include="Presentation\MapPolyline.cs" />
+    <Compile Include="Presentation\PolylineEntity.cs" />
+    <Compile Include="Presentation\PolylineEntityPresenter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Engine\Tile.cs" />
     <Compile Include="Engine\MapController.cs" />
