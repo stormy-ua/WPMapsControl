@@ -1,7 +1,9 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:vsm="clr-namespace:System.Windows;assembly=System.Windows" xmlns:mapsControl="clr-namespace:MapsControl"
+    xmlns:vsm="clr-namespace:System.Windows;assembly=System.Windows" 
+    xmlns:mapsControl="clr-namespace:MapsControl"
+    xmlns:presentation="clr-namespace:MapsControl.Presentation"
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit">
     <Style TargetType="mapsControl:MapsControl">
         <Setter Property="Template">

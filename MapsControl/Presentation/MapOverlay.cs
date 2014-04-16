@@ -12,7 +12,6 @@ using Microsoft.Phone.Maps.Controls;
 
 namespace MapsControl.Presentation
 {
-    [ContentProperty("Content")]
     public class MapOverlay : MapElement, IMapOverlayView
     {
         #region GeoCoordinate Property
@@ -38,29 +37,16 @@ namespace MapsControl.Presentation
 
         #endregion
 
-        #region ContentProperty
-
-        public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(
-            "Content", typeof (FrameworkElement), typeof (MapOverlay), new PropertyMetadata(default(UIElement)));
-
-        public FrameworkElement Content
-        {
-            get { return (FrameworkElement) GetValue(ContentProperty); }
-            set { SetValue(ContentProperty, value); }
-        }
-
-        #endregion
-
         #region Properties
 
         private TranslateTransform TranslateTransform
         {
-            get { return (TranslateTransform)Content.RenderTransform; }
+            get { return (TranslateTransform)VisualRoot.RenderTransform; }
         }
 
         public FrameworkElement VisualRoot
         {
-            get { return Content; }
+            get { return (FrameworkElement)Content; }
         }
 
         public double OffsetX

@@ -31,7 +31,7 @@ namespace MapsControl
 
         private readonly IMapController _mapController = new MapController(5, 256);
         private readonly IList<TilePresenter> _tileElements = new List<TilePresenter>();
-        private Panel _canvas;
+        private Panel _panel;
         private Size _windowSize;
 
         #endregion
@@ -127,7 +127,7 @@ namespace MapsControl
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            _canvas = (Panel)GetTemplateChild("PART_Panel");
+            _panel = (Panel)GetTemplateChild("PART_Panel");
         }
 
         protected override Size ArrangeOverride(Size arrangeBounds)
@@ -135,7 +135,7 @@ namespace MapsControl
             _windowSize = arrangeBounds;
             _mapController.ViewWindowSize = _windowSize;
 
-            _canvas.Clip = new RectangleGeometry
+            _panel.Clip = new RectangleGeometry
             {
                 Rect = new Rect(0, 0, _windowSize.Width, _windowSize.Height)
             };
@@ -150,7 +150,7 @@ namespace MapsControl
                 var tileElement = new TilePresenter(tileView, tile);
 
                 _tileElements.Add(tileElement);
-                _canvas.Children.Add(tileView.VisualRoot);
+                _panel.Children.Add(tileView.VisualRoot);
             }
 
             foreach (var mapOverlay in MapElements.OfType<MapOverlay>())
@@ -159,7 +159,7 @@ namespace MapsControl
                 var mapEntityPresenter = new MapOverlayPresenter(_mapController, mapOverlay, pin);
 
                 _mapController.AddPin(pin);
-                _canvas.Children.Add(mapOverlay.Content);
+                _panel.Children.Add(mapOverlay);
             }
 
             foreach (var mapPolyline in MapElements.OfType<MapPolyline>())
@@ -168,7 +168,7 @@ namespace MapsControl
                 var polylineEntityPresenter = new PolylineEntityPresenter(_mapController, mapPolyline, polylineEntity);
 
                 _mapController.AddPolyline(polylineEntity);
-                _canvas.Children.Add(mapPolyline.VisualRoot);
+                _panel.Children.Add(mapPolyline);
             }
         }
 

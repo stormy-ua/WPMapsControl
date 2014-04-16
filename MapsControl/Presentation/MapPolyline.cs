@@ -15,7 +15,6 @@ using Microsoft.Phone.Maps.Controls;
 
 namespace MapsControl.Presentation
 {
-    [ContentProperty("Path")]
     public class MapPolyline : MapElement, IPolylineEntityView
     {
         #region Fields
@@ -39,6 +38,7 @@ namespace MapsControl.Presentation
             var mapPolyline = (MapPolyline) dependencyObject;
             var geoCoordinates = (GeoCoordinateCollection) args.NewValue;
 
+            mapPolyline.Content = mapPolyline._polyline;
             mapPolyline._polyline.Points.Clear();
             geoCoordinates.Select(c => new Point())
                 .ForEach(mapPolyline._polyline.Points.Add);

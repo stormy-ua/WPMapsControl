@@ -44,7 +44,7 @@
                                      GeoCoordinateCenter="50.39456,30.5978478"
                                      LevelOfDetails="15">
                 <presentation:MapPolyline Path="50.39456,30.5978478 50.39266,30.598848 50.39346,30.601" />
-                <presentation:MapOverlay GeoCoordinate="50.39456,30.5978478">
+                <presentation:MapOverlay GeoCoordinate="{Binding Path=GeoCoordinateCenter, ElementName=Map}">
                     <Path Stroke="Green" Data="M 0,50 0,0 30,0 30,25 10,25 3,50 Z" Fill="Green"
                       Width="30"
                       Height="50">
