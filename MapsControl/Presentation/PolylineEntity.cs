@@ -17,7 +17,11 @@ namespace MapsControl.Presentation
         public PolylineEntity(IEnumerable<GeoCoordinate> geoCoordinates)
         {
             Pins = new ObservableCollection<Pin>();
-            geoCoordinates.Select(c => new Pin { GeoCoordinate = c}).ForEach(Pins.Add);
+
+            if (geoCoordinates != null)
+            {
+                geoCoordinates.Select(c => new Pin { GeoCoordinate = c }).ForEach(Pins.Add);                
+            }
         }
     }
 }

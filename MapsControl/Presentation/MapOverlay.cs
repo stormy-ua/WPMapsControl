@@ -79,6 +79,19 @@ namespace MapsControl.Presentation
             }
         }
 
+        protected override void OnContentChanged(object oldContent, object newContent)
+        {
+            base.OnContentChanged(oldContent, newContent);
+
+            var content = newContent as FrameworkElement;
+            if (content == null)
+            {
+                return;
+            }
+
+            content.RenderTransform = new TranslateTransform();
+        }
+
         #endregion
     }
 }

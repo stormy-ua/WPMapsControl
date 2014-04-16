@@ -23,8 +23,16 @@ namespace MapsControl.Presentation
             _polylineEntity = polylineEntity;
             _mapController = mapController;
 
-            polylineEntity.Pins.ForEach(AttachPin);
-            polylineEntity.Pins.CollectionChanged += (sender, args) =>
+            _view.GeoCoordinatesChanged += (sender, args) => AttachPins();
+        }
+
+        private void AttachPins()
+        {
+            _polylineEntity.Pins.Clear();
+            _view.Path.Select(c => new Pin { GeoCoordinate = c}).ForEach(_polylineEntity.Pins.Add);
+
+            _polylineEntity.Pins.ForEach(AttachPin);
+            _polylineEntity.Pins.CollectionChanged += (sender, args) =>
             {
                 if (args.Action != NotifyCollectionChangedAction.Add)
                 {
