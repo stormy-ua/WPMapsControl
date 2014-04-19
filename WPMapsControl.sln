@@ -1,16 +1,24 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapsControl", "MapsControl\MapsControl.csproj", "{0276AC20-CF00-46F3-BAEB-646F50C96885}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "SampleApp\SampleApp.csproj", "{8A1A21E6-D5E2-4F4B-944B-7189BE4582F6}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6DD64587-9A17-42E0-A740-9DD0C27CE331}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Desktop", "Desktop", "{B67DBB68-D491-407F-9549-13ADCAAD1E8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapsControl.Desktop", "MapsControl.Desktop\MapsControl.Desktop.csproj", "{22E0D274-E69F-422E-ACFC-0186A599C09F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Phone", "Phone", "{59E4D776-031E-4B34-900D-051E2BCD4839}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapsControl.Phone", "MapsControl.Phone\MapsControl.Phone.csproj", "{0276AC20-CF00-46F3-BAEB-646F50C96885}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp.Desktop", "SampleApp.Desktop\SampleApp.Desktop.csproj", "{6DF89C7B-D4EC-48A7-9AED-9524F917DAB5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp.Phone", "SampleApp.Phone\SampleApp.Phone.csproj", "{8A1A21E6-D5E2-4F4B-944B-7189BE4582F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,6 +30,14 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{22E0D274-E69F-422E-ACFC-0186A599C09F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22E0D274-E69F-422E-ACFC-0186A599C09F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22E0D274-E69F-422E-ACFC-0186A599C09F}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{22E0D274-E69F-422E-ACFC-0186A599C09F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{22E0D274-E69F-422E-ACFC-0186A599C09F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22E0D274-E69F-422E-ACFC-0186A599C09F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22E0D274-E69F-422E-ACFC-0186A599C09F}.Release|ARM.ActiveCfg = Release|Any CPU
+		{22E0D274-E69F-422E-ACFC-0186A599C09F}.Release|x86.ActiveCfg = Release|Any CPU
 		{0276AC20-CF00-46F3-BAEB-646F50C96885}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0276AC20-CF00-46F3-BAEB-646F50C96885}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0276AC20-CF00-46F3-BAEB-646F50C96885}.Debug|ARM.ActiveCfg = Debug|ARM
@@ -34,6 +50,14 @@ Global
 		{0276AC20-CF00-46F3-BAEB-646F50C96885}.Release|ARM.Build.0 = Release|ARM
 		{0276AC20-CF00-46F3-BAEB-646F50C96885}.Release|x86.ActiveCfg = Release|x86
 		{0276AC20-CF00-46F3-BAEB-646F50C96885}.Release|x86.Build.0 = Release|x86
+		{6DF89C7B-D4EC-48A7-9AED-9524F917DAB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DF89C7B-D4EC-48A7-9AED-9524F917DAB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DF89C7B-D4EC-48A7-9AED-9524F917DAB5}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{6DF89C7B-D4EC-48A7-9AED-9524F917DAB5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6DF89C7B-D4EC-48A7-9AED-9524F917DAB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DF89C7B-D4EC-48A7-9AED-9524F917DAB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DF89C7B-D4EC-48A7-9AED-9524F917DAB5}.Release|ARM.ActiveCfg = Release|Any CPU
+		{6DF89C7B-D4EC-48A7-9AED-9524F917DAB5}.Release|x86.ActiveCfg = Release|Any CPU
 		{8A1A21E6-D5E2-4F4B-944B-7189BE4582F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8A1A21E6-D5E2-4F4B-944B-7189BE4582F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A1A21E6-D5E2-4F4B-944B-7189BE4582F6}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
@@ -55,5 +79,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{22E0D274-E69F-422E-ACFC-0186A599C09F} = {B67DBB68-D491-407F-9549-13ADCAAD1E8E}
+		{6DF89C7B-D4EC-48A7-9AED-9524F917DAB5} = {B67DBB68-D491-407F-9549-13ADCAAD1E8E}
+		{0276AC20-CF00-46F3-BAEB-646F50C96885} = {59E4D776-031E-4B34-900D-051E2BCD4839}
+		{8A1A21E6-D5E2-4F4B-944B-7189BE4582F6} = {59E4D776-031E-4B34-900D-051E2BCD4839}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{22E0D274-E69F-422E-ACFC-0186A599C09F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MapsControl.Desktop</RootNamespace>
+    <AssemblyName>MapsControl.Desktop</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;DESKTOP</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Device" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\MapsControl.Phone\Engine\GeoMathExtensions.cs">
+      <Link>Engine\GeoMathExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Engine\IMapController.cs">
+      <Link>Engine\IMapController.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Engine\ITileUriProvider.cs">
+      <Link>Engine\ITileUriProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Engine\MapController.cs">
+      <Link>Engine\MapController.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Engine\MapEntity.cs">
+      <Link>Engine\MapEntity.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Engine\MapMath.cs">
+      <Link>Engine\MapMath.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Engine\Pin.cs">
+      <Link>Engine\Pin.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Engine\Point2D.cs">
+      <Link>Engine\Point2D.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Engine\Point2DExtensions.cs">
+      <Link>Engine\Point2DExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Engine\Tile.cs">
+      <Link>Engine\Tile.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Infrastructure\EnumerableExtensions.cs">
+      <Link>Infrastructure\EnumerableExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Infrastructure\FormattingExtensions.cs">
+      <Link>Infrastructure\FormattingExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\MapElement.cs">
+      <Link>MapElement.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\MapsControl.cs">
+      <Link>MapsControl.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Presentation\ImageTileView.cs">
+      <Link>Presentation\ImageTileView.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Presentation\IMapEntityView.cs">
+      <Link>Presentation\IMapEntityView.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Presentation\IMapOverlayView.cs">
+      <Link>Presentation\IMapOverlayView.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Presentation\IPolylineEntityView.cs">
+      <Link>Presentation\IPolylineEntityView.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Presentation\ITileView.cs">
+      <Link>Presentation\ITileView.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Presentation\MapEntityPresenter.cs">
+      <Link>Presentation\MapEntityPresenter.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Presentation\MapEntityView.cs">
+      <Link>Presentation\MapEntityView.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Presentation\MapOverlay.cs">
+      <Link>Presentation\MapOverlay.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Presentation\MapOverlayPresenter.cs">
+      <Link>Presentation\MapOverlayPresenter.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Presentation\MapPolyline.cs">
+      <Link>Presentation\MapPolyline.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Presentation\PolylineEntity.cs">
+      <Link>Presentation\PolylineEntity.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Presentation\PolylineEntityPresenter.cs">
+      <Link>Presentation\PolylineEntityPresenter.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Presentation\TilePresenter.cs">
+      <Link>Presentation\TilePresenter.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\TileUriProviders\NullTileUriProvider.cs">
+      <Link>TileUriProviders\NullTileUriProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\TileUriProviders\TileUriProvider.cs">
+      <Link>TileUriProviders\TileUriProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\TileUriProviders\TileUriProviders.cs">
+      <Link>TileUriProviders\TileUriProviders.cs</Link>
+    </Compile>
+    <Compile Include="Presentation\TypeConverters\GeoCoordinateCollectionConverter.cs" />
+    <Compile Include="Presentation\TypeConverters\GeoCoordinateConverter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Themes\generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
