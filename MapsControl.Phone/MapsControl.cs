@@ -38,6 +38,9 @@ namespace MapsControl
         private readonly IList<TilePresenter> _tileElements = new List<TilePresenter>();
         private Panel _panel;
         private Size _windowSize;
+#if DESKTOP
+        private Point _dragStartPoint;
+#endif
 
         #endregion
 
@@ -124,6 +127,10 @@ namespace MapsControl
 
             ManipulationDelta += OnManipulationDelta;
             Loaded += OnLoaded;
+#if DESKTOP
+            PreviewMouseMove += OnPreviewMouseMove;
+            PreviewMouseLeftButtonDown += OnPreviewMouseLeftButtonDown;
+#endif
         }
 
         #endregion
@@ -180,5 +187,26 @@ namespace MapsControl
         {
             _mapController.Move(args.DeltaManipulation.Translation.ToPoint2D());
         }
+
+#if DESKTOP
+        private void OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _dragStartPoint = e.GetPosition(null);
+        }
+
+        private void OnPreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            Point mousePos = e.GetPosition(null);
+            Vector translation = mousePos - _dragStartPoint;
+            _dragStartPoint = mousePos;
+
+            if (e.LeftButton == MouseButtonState.Pressed &&
+                (Math.Abs(translation.X) > SystemParameters.MinimumHorizontalDragDistance ||
+                Math.Abs(translation.Y) > SystemParameters.MinimumVerticalDragDistance))
+            {
+                _mapController.Move(translation.ToPoint2D());
+            }
+        }
+#endif
     }
 }
