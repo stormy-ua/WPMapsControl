@@ -46,7 +46,7 @@ namespace MapsControl.Presentation
 
         private TranslateTransform TranslateTransform
         {
-            get { return (TranslateTransform)VisualRoot.RenderTransform; }
+            get { return (TranslateTransform)RenderTransform; }
         }
 
         public FrameworkElement VisualRoot
@@ -71,6 +71,15 @@ namespace MapsControl.Presentation
         #region Events
 
         public event EventHandler<GeoCoordinate> GeoCoordinateChanged;
+
+        #endregion
+
+        #region Constructors
+
+        public MapOverlay()
+        {
+            RenderTransform = new TranslateTransform();
+        }
 
         #endregion
 
