@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Device.Location;
 using System.Diagnostics;
 using System.Linq;
+using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,16 +14,16 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using MapsControl.Engine;
 using MapsControl.Presentation;
 using MapsControl.TileUriProviders;
 #if WINDOWS_PHONE
-using Microsoft.Phone.Controls;
 using Microsoft.Phone.Maps.Controls;
+using Microsoft.Phone.Reactive;
 #endif
 #if DESKTOP
 using MapsControl.Desktop.Presentation.TypeConverters;
+using System.Reactive.Linq;
 #endif
 using MapOverlay = MapsControl.Presentation.MapOverlay;
 using MapPolyline = MapsControl.Presentation.MapPolyline;
@@ -30,17 +31,13 @@ using MapPolyline = MapsControl.Presentation.MapPolyline;
 namespace MapsControl
 {
     [ContentProperty("MapElements")]
-    public class MapsControl : Control
+    public class MapsControl : Control, IMapView
     {
         #region Fields
 
-        private readonly IMapController _mapController = new MapController(5, 256);
-        private readonly IList<TilePresenter> _tileElements = new List<TilePresenter>();
+        private readonly IMapPresenter _mapPresenter;
         private Panel _panel;
-        private Size _windowSize;
-#if DESKTOP
-        private Point _dragStartPoint;
-#endif
+        private readonly MapCommands _mapCommands = new MapCommands();
 
         #endregion
 
@@ -60,7 +57,7 @@ namespace MapsControl
         private static void OnGeoCoordinateCenterPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
         {
             var mapsControl = (MapsControl)dependencyObject;
-            mapsControl._mapController.SetGeoCoordinateCenter((GeoCoordinate)args.NewValue);
+            mapsControl._mapCommands.GeoCoordinateCentersSubject.OnNext((GeoCoordinate)args.NewValue);
         }
 
         #endregion
@@ -80,7 +77,7 @@ namespace MapsControl
         private static void OnLevelOfDetailsPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
         {
             var mapsControl = (MapsControl)dependencyObject;
-            mapsControl._mapController.LevelOfDetail = (double)args.NewValue;
+            mapsControl._mapCommands.ZoomsSubject.OnNext((double)args.NewValue);
         }
 
         #endregion
@@ -107,7 +104,7 @@ namespace MapsControl
                 return;
             }
 
-            mapsControl._mapController.TileUriProvider = tileUriProvider;
+            mapsControl._mapCommands.TileUriProvidersSubject.OnNext(tileUriProvider);
         }
 
         #endregion
@@ -125,12 +122,48 @@ namespace MapsControl
             DefaultStyleKey = typeof (MapsControl);
             MapElements = new ObservableCollection<MapElement>();
 
-            ManipulationDelta += OnManipulationDelta;
-            Loaded += OnLoaded;
 #if DESKTOP
-            PreviewMouseMove += OnPreviewMouseMove;
-            PreviewMouseLeftButtonDown += OnPreviewMouseLeftButtonDown;
+            _mapCommands.Translations = Observable.FromEventPattern<ManipulationDeltaEventArgs>(this, "ManipulationDelta")
+                      .Select(args => args.EventArgs.DeltaManipulation.Translation.ToPoint2D());
+            _mapCommands.SizeChanges = Observable.FromEventPattern<SizeChangedEventArgs>(this, "SizeChanged")
+                      .Select(args => args.EventArgs.NewSize);
+            _mapCommands.Initialized = Observable.FromEventPattern<RoutedEventArgs>(this, "Loaded")
+                      .Select(args => args.EventArgs);
+
+            _mapCommands.SizeChanges.Subscribe(size => _panel.Clip = new RectangleGeometry { Rect = new Rect(0, 0, size.Width, size.Height) });
+            _mapCommands.EntityViewAdded = Observable.FromEventPattern<NotifyCollectionChangedEventArgs>(MapElements, "CollectionChanged")
+                                        .Where(args => args.EventArgs.Action == NotifyCollectionChangedAction.Add)
+                                        .Select(args => args.EventArgs.NewItems.OfType<IMapEntityView>())
+                                        .Where(entityView => entityView != null && entityView.Any());
+
+            var mouseDownPoints = Observable.FromEventPattern<MouseButtonEventArgs>(this, "MouseLeftButtonDown");
+            var mouseUpPoints = Observable.FromEventPattern<MouseButtonEventArgs>(this, "MouseLeftButtonUp");
+            var mouseMovePoints = Observable.FromEventPattern<MouseEventArgs>(this, "MouseMove")
+                .Select(e => e.EventArgs.GetPosition(null))
+                .SkipUntil(mouseDownPoints)
+                .TakeUntil(mouseUpPoints);
+            _mapCommands.Translations = mouseMovePoints
+                .Skip(1)
+                .CombineLatest(mouseMovePoints, (point2, point1) => (point2 - point1).ToPoint2D())
+                .Repeat();
 #endif
+
+#if WINDOWS_PHONE
+            _mapCommands.Translations = Observable.FromEvent<ManipulationDeltaEventArgs>(this, "ManipulationDelta")
+                      .Select(args => args.EventArgs.DeltaManipulation.Translation.ToPoint2D());
+            _mapCommands.SizeChanges = Observable.FromEvent<SizeChangedEventArgs>(this, "SizeChanged")
+                      .Select(args => args.EventArgs.NewSize);
+            _mapCommands.Initialized = Observable.FromEvent<RoutedEventArgs>(this, "Loaded")
+                      .Select(args => args.EventArgs);
+
+            _mapCommands.SizeChanges.Subscribe(size => _panel.Clip = new RectangleGeometry { Rect = new Rect(0, 0, size.Width, size.Height) });
+            _mapCommands.EntityViewAdded = Observable.FromEvent<NotifyCollectionChangedEventArgs>(MapElements, "CollectionChanged")
+                                        .Where(args => args.EventArgs.Action == NotifyCollectionChangedAction.Add)
+                                        .Select(args => args.EventArgs.NewItems.OfType<IMapEntityView>())
+                                        .Where(entityView => entityView != null && entityView.Any());
+#endif
+
+            _mapPresenter = new MapPresenter(this, _mapCommands, 5);
         }
 
         #endregion
@@ -141,72 +174,18 @@ namespace MapsControl
             _panel = (Panel)GetTemplateChild("PART_Panel");
         }
 
-        protected override Size ArrangeOverride(Size arrangeBounds)
-        {
-            _windowSize = arrangeBounds;
-            _mapController.ViewWindowSize = _windowSize;
+        #region IMapView
 
-            _panel.Clip = new RectangleGeometry
-            {
-                Rect = new Rect(0, 0, _windowSize.Width, _windowSize.Height)
-            };
-            return base.ArrangeOverride(arrangeBounds);
+        public void Add(IMapEntityView mapEntityView)
+        {
+            _panel.Children.Add(mapEntityView.VisualRoot);
         }
 
-        private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
+        public void Remove(IMapEntityView mapEntityView)
         {
-            foreach (var tile in _mapController.Tiles)
-            {
-                var tileView = new ImageTileView(_mapController.TileSize);
-                var tileElement = new TilePresenter(tileView, tile);
-
-                _tileElements.Add(tileElement);
-                _panel.Children.Add(tileView.VisualRoot);
-            }
-
-            foreach (var mapOverlay in MapElements.OfType<MapOverlay>())
-            {
-                var pin = new Pin { GeoCoordinate = mapOverlay.GeoCoordinate };
-                var mapEntityPresenter = new MapOverlayPresenter(_mapController, mapOverlay, pin);
-
-                _mapController.AddPin(pin);
-                _panel.Children.Add(mapOverlay);
-            }
-
-            foreach (var mapPolyline in MapElements.OfType<MapPolyline>())
-            {
-                var polylineEntity = new PolylineEntity(mapPolyline.Path);
-                var polylineEntityPresenter = new PolylineEntityPresenter(_mapController, mapPolyline, polylineEntity);
-
-                _mapController.AddPolyline(polylineEntity);
-                _panel.Children.Add(mapPolyline);
-            }
+            _panel.Children.Remove(mapEntityView.VisualRoot);
         }
 
-        private void OnManipulationDelta(object sender, ManipulationDeltaEventArgs args)
-        {
-            _mapController.Move(args.DeltaManipulation.Translation.ToPoint2D());
-        }
-
-#if DESKTOP
-        private void OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            _dragStartPoint = e.GetPosition(null);
-        }
-
-        private void OnPreviewMouseMove(object sender, MouseEventArgs e)
-        {
-            Point mousePos = e.GetPosition(null);
-            Vector translation = mousePos - _dragStartPoint;
-            _dragStartPoint = mousePos;
-
-            if (e.LeftButton == MouseButtonState.Pressed &&
-                (Math.Abs(translation.X) > SystemParameters.MinimumHorizontalDragDistance ||
-                Math.Abs(translation.Y) > SystemParameters.MinimumVerticalDragDistance))
-            {
-                _mapController.Move(translation.ToPoint2D());
-            }
-        }
-#endif
+        #endregion
     }
 }

@@ -14,9 +14,9 @@ namespace MapsControl.Presentation
     {
         private readonly IPolylineEntityView _view;
         private readonly PolylineEntity _polylineEntity;
-        private readonly IMapController _mapController;
+        private readonly IMapPresenter _mapController;
 
-        public PolylineEntityPresenter(IMapController mapController, IPolylineEntityView view,
+        public PolylineEntityPresenter(IMapPresenter mapController, IPolylineEntityView view,
             PolylineEntity polylineEntity)
         {
             _view = view;

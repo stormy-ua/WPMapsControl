@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Deployment xmlns="http://schemas.microsoft.com/windowsphone/2012/deployment" AppPlatformVersion="8.0">
   <DefaultLanguage xmlns="" code="en-US" />
-  <App xmlns="" ProductID="{8a1a21e6-d5e2-4f4b-944b-7189be4582f6}" Title="WPMapsControl" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="WPMapsControl author" Description="Sample description" Publisher="WPMapsControl" PublisherID="{40258a5c-8540-416b-bce3-4eb319c21647}">
+  <App xmlns="" ProductID="{8a1a21e6-d5e2-4f4b-944b-7189be4582f6}" Title="MapsControl.Phone.Sample" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="WPMapsControl author" Description="Sample description" Publisher="WPMapsControl" PublisherID="{40258a5c-8540-416b-bce3-4eb319c21647}">
     <IconPath IsRelative="true" IsResource="false">Assets\ApplicationIcon.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_NETWORKING" />

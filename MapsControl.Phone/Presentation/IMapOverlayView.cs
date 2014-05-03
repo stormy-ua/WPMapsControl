@@ -9,6 +9,7 @@ namespace MapsControl.Presentation
 {
     public interface IMapOverlayView : IMapEntityView
     {
+        GeoCoordinate GeoCoordinate { get; set; }
         event EventHandler<GeoCoordinate> GeoCoordinateChanged;
     }
 }

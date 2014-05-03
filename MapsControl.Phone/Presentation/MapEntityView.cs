@@ -6,7 +6,7 @@ using System;
 
 namespace MapsControl.Presentation
 {
-    public class MapEntityView : IMapOverlayView
+    public class MapEntityView : IMapEntityView
     {
         #region Fields
 
@@ -37,12 +37,6 @@ namespace MapsControl.Presentation
             get { return TranslateTransform.Y; }
             set { TranslateTransform.Y = value; }
         }
-
-        #endregion
-
-        #region Events
-
-        public event EventHandler<GeoCoordinate> GeoCoordinateChanged;
 
         #endregion
 

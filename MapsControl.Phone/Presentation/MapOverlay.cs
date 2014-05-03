@@ -51,7 +51,7 @@ namespace MapsControl.Presentation
 
         public FrameworkElement VisualRoot
         {
-            get { return (FrameworkElement)Content; }
+            get { return this; }
         }
 
         public double OffsetX

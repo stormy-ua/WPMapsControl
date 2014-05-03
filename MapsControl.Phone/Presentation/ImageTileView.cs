@@ -13,7 +13,6 @@ namespace MapsControl.Presentation
 
         #endregion
 
-
         #region Properties
 
         private BitmapImage Bitmap
@@ -71,7 +70,10 @@ namespace MapsControl.Presentation
                 Width = tileSize,
                 Height = tileSize,
                 CacheMode = new BitmapCache(),
-                RenderTransform = new TranslateTransform()
+                RenderTransform = new TranslateTransform(),
+#if WINDOWS_PHONE
+                Source = CreateImageSource(tileSize)
+#endif
             };
             return image;
         }

@@ -13,6 +13,8 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -40,6 +42,18 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Device" />
+    <Reference Include="System.Reactive.Core">
+      <HintPath>..\packages\Rx-Core.2.2.4\lib\net45\System.Reactive.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces">
+      <HintPath>..\packages\Rx-Interfaces.2.2.4\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Linq">
+      <HintPath>..\packages\Rx-Linq.2.2.4\lib\net45\System.Reactive.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices">
+      <HintPath>..\packages\Rx-PlatformServices.2.2.4\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -56,20 +70,26 @@
     <Compile Include="..\MapsControl.Phone\Engine\GeoMathExtensions.cs">
       <Link>Engine\GeoMathExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\MapsControl.Phone\Engine\IMapController.cs">
-      <Link>Engine\IMapController.cs</Link>
+    <Compile Include="..\MapsControl.Phone\Engine\IMapCommands.cs">
+      <Link>Engine\IMapCommands.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Engine\IMapPresenter.cs">
+      <Link>Engine\IMapPresenter.cs</Link>
     </Compile>
     <Compile Include="..\MapsControl.Phone\Engine\ITileUriProvider.cs">
       <Link>Engine\ITileUriProvider.cs</Link>
     </Compile>
-    <Compile Include="..\MapsControl.Phone\Engine\MapController.cs">
-      <Link>Engine\MapController.cs</Link>
+    <Compile Include="..\MapsControl.Phone\Engine\MapCommands.cs">
+      <Link>Engine\MapCommands.cs</Link>
     </Compile>
     <Compile Include="..\MapsControl.Phone\Engine\MapEntity.cs">
       <Link>Engine\MapEntity.cs</Link>
     </Compile>
     <Compile Include="..\MapsControl.Phone\Engine\MapMath.cs">
       <Link>Engine\MapMath.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Engine\MapPresenter.cs">
+      <Link>Engine\MapPresenter.cs</Link>
     </Compile>
     <Compile Include="..\MapsControl.Phone\Engine\Pin.cs">
       <Link>Engine\Pin.cs</Link>
@@ -103,6 +123,9 @@
     </Compile>
     <Compile Include="..\MapsControl.Phone\Presentation\IMapOverlayView.cs">
       <Link>Presentation\IMapOverlayView.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Presentation\IMapView.cs">
+      <Link>Presentation\IMapView.cs</Link>
     </Compile>
     <Compile Include="..\MapsControl.Phone\Presentation\IPolylineEntityView.cs">
       <Link>Presentation\IPolylineEntityView.cs</Link>
@@ -162,6 +185,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -176,6 +200,13 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

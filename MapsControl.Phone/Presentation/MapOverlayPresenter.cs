@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
 using MapsControl.Engine;
 
 namespace MapsControl.Presentation
@@ -8,7 +10,7 @@ namespace MapsControl.Presentation
     {
         #region Constructors
 
-        public MapOverlayPresenter(IMapController mapController, IMapOverlayView view, Pin pin)
+        public MapOverlayPresenter(IMapPresenter mapController, IMapOverlayView view, Pin pin)
             : base(view, pin)
         {
             mapController.PositionPin(pin);
@@ -26,7 +28,7 @@ namespace MapsControl.Presentation
         protected override void OnOffsetChanged()
         {
             base.OnOffsetChanged();
-            _mapEntityView.OffsetY -= _mapEntityView.VisualRoot.Height;
+            //_mapEntityView.OffsetY -= ((FrameworkElement)((ContentControl)_mapEntityView.VisualRoot).Content).Height;
         }
 
         #endregion
