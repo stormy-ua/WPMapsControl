@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Device.Location;
 using System.Linq;
+#if DESKTOP
 using System.Reactive.Subjects;
+#endif
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
