@@ -1,4 +1,10 @@
 ﻿using System;
+#if WINDOWS_PHONE
+using Microsoft.Phone.Reactive;
+#endif
+#if DESKTOP
+using System.Reactive.Subjects;
+#endif
 
 namespace MapsControl.Engine
 {
@@ -6,24 +12,29 @@ namespace MapsControl.Engine
     {
         #region Fields
 
-        private Uri _uri;
+        private readonly ISubject<TileSource> _tileSourceChangesSubject = new Subject<TileSource>();
+        private TileSource _tileSource;
 
         #endregion
 
         #region Properties
 
-        public Uri Uri
+        public IObservable<TileSource> TileSourceChanges { get { return _tileSourceChangesSubject; } } 
+
+        public TileSource TileSource
         {
-            get { return _uri; }
+            get { return _tileSource; }
             set
             {
-                if (_uri != value)
+                if (_tileSource != value)
                 {
-                    _uri = value;
-                    OnPropertyChanged();
+                    _tileSource = value;
+                    _tileSourceChangesSubject.OnNext(_tileSource);
                 }
             }
         }
+
+        public double LevelOfDetails { get; set; }
 
         #endregion
     }   

@@ -20,7 +20,6 @@ namespace MapsControl.Engine
                 if (_geoCoordinate != value)
                 {
                     _geoCoordinate = value;
-                    OnPropertyChanged();
                 }
             }
         }

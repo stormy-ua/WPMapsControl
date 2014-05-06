@@ -73,11 +73,11 @@
     <Compile Include="..\MapsControl.Phone\Engine\IMapCommands.cs">
       <Link>Engine\IMapCommands.cs</Link>
     </Compile>
-    <Compile Include="..\MapsControl.Phone\Engine\IMapPresenter.cs">
-      <Link>Engine\IMapPresenter.cs</Link>
+    <Compile Include="..\MapsControl.Phone\Engine\ITileLoader.cs">
+      <Link>Engine\ITileLoader.cs</Link>
     </Compile>
-    <Compile Include="..\MapsControl.Phone\Engine\ITileUriProvider.cs">
-      <Link>Engine\ITileUriProvider.cs</Link>
+    <Compile Include="..\MapsControl.Phone\Engine\ITileSourceProvider.cs">
+      <Link>Engine\ITileSourceProvider.cs</Link>
     </Compile>
     <Compile Include="..\MapsControl.Phone\Engine\MapCommands.cs">
       <Link>Engine\MapCommands.cs</Link>
@@ -103,6 +103,18 @@
     <Compile Include="..\MapsControl.Phone\Engine\Tile.cs">
       <Link>Engine\Tile.cs</Link>
     </Compile>
+    <Compile Include="..\MapsControl.Phone\Engine\TileByteArraySource.cs">
+      <Link>Engine\TileByteArraySource.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Engine\TileLoader.cs">
+      <Link>Engine\TileLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Engine\TileSource.cs">
+      <Link>Engine\TileSource.cs</Link>
+    </Compile>
+    <Compile Include="..\MapsControl.Phone\Engine\TileUriSource.cs">
+      <Link>Engine\TileUriSource.cs</Link>
+    </Compile>
     <Compile Include="..\MapsControl.Phone\Infrastructure\EnumerableExtensions.cs">
       <Link>Infrastructure\EnumerableExtensions.cs</Link>
     </Compile>
@@ -111,9 +123,6 @@
     </Compile>
     <Compile Include="..\MapsControl.Phone\MapElement.cs">
       <Link>MapElement.cs</Link>
-    </Compile>
-    <Compile Include="..\MapsControl.Phone\MapsControl.cs">
-      <Link>MapsControl.cs</Link>
     </Compile>
     <Compile Include="..\MapsControl.Phone\Presentation\ImageTileView.cs">
       <Link>Presentation\ImageTileView.cs</Link>
@@ -133,17 +142,11 @@
     <Compile Include="..\MapsControl.Phone\Presentation\ITileView.cs">
       <Link>Presentation\ITileView.cs</Link>
     </Compile>
-    <Compile Include="..\MapsControl.Phone\Presentation\MapEntityPresenter.cs">
-      <Link>Presentation\MapEntityPresenter.cs</Link>
-    </Compile>
     <Compile Include="..\MapsControl.Phone\Presentation\MapEntityView.cs">
       <Link>Presentation\MapEntityView.cs</Link>
     </Compile>
     <Compile Include="..\MapsControl.Phone\Presentation\MapOverlay.cs">
       <Link>Presentation\MapOverlay.cs</Link>
-    </Compile>
-    <Compile Include="..\MapsControl.Phone\Presentation\MapOverlayPresenter.cs">
-      <Link>Presentation\MapOverlayPresenter.cs</Link>
     </Compile>
     <Compile Include="..\MapsControl.Phone\Presentation\MapPolyline.cs">
       <Link>Presentation\MapPolyline.cs</Link>
@@ -154,9 +157,6 @@
     <Compile Include="..\MapsControl.Phone\Presentation\PolylineEntityPresenter.cs">
       <Link>Presentation\PolylineEntityPresenter.cs</Link>
     </Compile>
-    <Compile Include="..\MapsControl.Phone\Presentation\TilePresenter.cs">
-      <Link>Presentation\TilePresenter.cs</Link>
-    </Compile>
     <Compile Include="..\MapsControl.Phone\TileUriProviders\NullTileUriProvider.cs">
       <Link>TileUriProviders\NullTileUriProvider.cs</Link>
     </Compile>
@@ -166,6 +166,10 @@
     <Compile Include="..\MapsControl.Phone\TileUriProviders\TileUriProviders.cs">
       <Link>TileUriProviders\TileUriProviders.cs</Link>
     </Compile>
+    <Compile Include="..\MapsControl\MapsControlBase.cs">
+      <Link>MapsControlBase.cs</Link>
+    </Compile>
+    <Compile Include="MapsControl.cs" />
     <Compile Include="Presentation\TypeConverters\GeoCoordinateCollectionConverter.cs" />
     <Compile Include="Presentation\TypeConverters\GeoCoordinateConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

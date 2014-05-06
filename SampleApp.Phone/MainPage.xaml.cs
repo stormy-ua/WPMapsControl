@@ -1,5 +1,6 @@
 ﻿using System.Device.Location;
 using System.Windows;
+using MapsControl.Phone.TileSources.MbTiles;
 using MapsControl.TileUriProviders;
 using Microsoft.Phone.Controls;
 
@@ -12,8 +13,10 @@ namespace SampleApp
         {
             InitializeComponent();
 
-            Map.TileUriProvider = TileUriProviders.OpenCycleMap
-                .WithCache("OpenCycleCache/{zoom}/{x}_{y}.png");
+/*            Map.TileUriProvider = TileUriProviders.OpenCycleMap
+                .WithCache("OpenCycleCache/{zoom}/{x}_{y}.png");*/
+
+            Map.TileUriProvider = new MbTilesSource("Kiev_Center_And_Left_Bank_13_17.sqlite3");
 
             Loaded += MainPage_Loaded;
         }

@@ -9,10 +9,10 @@ namespace MapsControl.TileUriProviders
 {
     public static class TileUriProviders
     {
-        public static ITileUriProvider OpenCycleMap { get; private set; }
-        public static ITileUriProvider OpenStreetMap { get; private set; }
-        public static ITileUriProvider GoogleHybridMap { get; private set; }
-        public static ITileUriProvider YandexMap { get; private set; }
+        public static ITileSourceProvider OpenCycleMap { get; private set; }
+        public static ITileSourceProvider OpenStreetMap { get; private set; }
+        public static ITileSourceProvider GoogleHybridMap { get; private set; }
+        public static ITileSourceProvider YandexMap { get; private set; }
 
         static TileUriProviders()
         {

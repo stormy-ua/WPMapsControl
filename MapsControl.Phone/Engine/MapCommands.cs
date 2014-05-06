@@ -23,7 +23,7 @@ namespace MapsControl.Engine
 
         public ISubject<double> ZoomsSubject { get; set; }
 
-        public ISubject<ITileUriProvider> TileUriProvidersSubject { get; set; }
+        public ISubject<ITileSourceProvider> TileUriProvidersSubject { get; set; }
 
         #endregion
 
@@ -39,7 +39,7 @@ namespace MapsControl.Engine
 
         public IObservable<double> Zooms { get { return ZoomsSubject; } }
 
-        public IObservable<ITileUriProvider> TileUriProviders { get { return TileUriProvidersSubject; } }
+        public IObservable<ITileSourceProvider> TileUriProviders { get { return TileUriProvidersSubject; } }
 
         public IObservable<IEnumerable<IMapEntityView>> EntityViewAdded { get; set; }
 
@@ -51,7 +51,7 @@ namespace MapsControl.Engine
         {
             GeoCoordinateCentersSubject = new Subject<GeoCoordinate>();
             ZoomsSubject = new Subject<double>();
-            TileUriProvidersSubject = new Subject<ITileUriProvider>();
+            TileUriProvidersSubject = new Subject<ITileSourceProvider>();
         }
 
         #endregion

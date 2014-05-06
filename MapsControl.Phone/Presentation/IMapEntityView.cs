@@ -5,7 +5,6 @@ namespace MapsControl.Presentation
     public interface IMapEntityView
     {
         FrameworkElement VisualRoot { get; }
-        double OffsetX { get; set; }
-        double OffsetY { get; set; }
+        Point Offset { get; set; }
     }
 }

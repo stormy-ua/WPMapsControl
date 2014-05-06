@@ -95,6 +95,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MapsControl.Desktop.TileSources.MbTiles\MapsControl.Desktop.TileSources.MbTiles.csproj">
+      <Project>{f013fe64-f629-4b93-9c59-bcba292fa55e}</Project>
+      <Name>MapsControl.Desktop.TileSources.MbTiles</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MapsControl.Desktop\MapsControl.Desktop.csproj">
       <Project>{22e0d274-e69f-422e-acfc-0186a599c09f}</Project>
       <Name>MapsControl.Desktop</Name>

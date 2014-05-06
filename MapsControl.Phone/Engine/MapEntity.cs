@@ -1,14 +1,21 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
+#if WINDOWS_PHONE
+using Microsoft.Phone.Reactive;
+#endif
+#if DESKTOP
+using System.Reactive.Subjects;
+#endif
 
 namespace MapsControl.Engine
 {
-    public class MapEntity : INotifyPropertyChanged
+    public class MapEntity
     {
         #region Fields
 
-        private int _mapX;
-        private int _mapY;
+        private readonly ISubject<Point> _offsetChangesSubject = new Subject<Point>();
         private double _offsetX;
         private double _offsetY;
 
@@ -16,31 +23,11 @@ namespace MapsControl.Engine
 
         #region Properties
 
-        public int MapX
-        {
-            get { return _mapX; }
-            set
-            {
-                if (_mapX != value)
-                {
-                    _mapX = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        public IObservable<Point> OffsetChanges { get { return _offsetChangesSubject; } }
 
-        public int MapY
-        {
-            get { return _mapY; }
-            set
-            {
-                if (_mapY != value)
-                {
-                    _mapY = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        public int MapX { get; set; }
+
+        public int MapY { get; set; }
 
         public double OffsetX
         {
@@ -50,7 +37,7 @@ namespace MapsControl.Engine
                 if (_offsetX != value)
                 {
                     _offsetX = value;
-                    OnPropertyChanged();
+                    _offsetChangesSubject.OnNext(new Point(OffsetX, OffsetY));
                 }
             }
         }
@@ -63,23 +50,8 @@ namespace MapsControl.Engine
                 if (_offsetY != value)
                 {
                     _offsetY = value;
-                    OnPropertyChanged();
+                    _offsetChangesSubject.OnNext(new Point(OffsetX, OffsetY));
                 }
-            }
-        }
-
-        #endregion
-
-        #region INotifyPropertyChanged
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName]string propertyName = null)
-        {
-            var handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(propertyName));
             }
         }
 

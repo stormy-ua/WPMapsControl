@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MapsControl.Desktop.TileSources.MbTiles;
 using MapsControl.TileUriProviders;
 
 namespace SampleApp.Desktop
@@ -23,7 +24,8 @@ namespace SampleApp.Desktop
         {
             InitializeComponent();
 
-            Map.TileUriProvider = TileUriProviders.GoogleHybridMap;
+//            Map.TileUriProvider = TileUriProviders.GoogleHybridMap;
+            Map.TileUriProvider = new MbTilesSource(@"C:\Maps\Kiev_Center_And_Left_Bank_13_17.db3");
         }
 
         private void ZoomInButtonOnClick(object sender, RoutedEventArgs e)

@@ -8,21 +8,21 @@ using MapsControl.Infrastructure;
 
 namespace MapsControl.TileUriProviders
 {
-    public class IsoStorageCacheTileProvider : ITileUriProvider
+    public class IsoStorageCacheTileProvider : ITileSourceProvider
     {
         #region Fields
 
         private readonly IIsoStorage _isoStorage = new IsoStorage();
-        private readonly ITileUriProvider _tileUriProvider;
+        private readonly ITileSourceProvider _tileSourceProvider;
         private readonly string _tilePathTemplate;
 
         #endregion
 
         #region Constructors
 
-        public IsoStorageCacheTileProvider(ITileUriProvider tileUriProvider, string tilePathTemplate)
+        public IsoStorageCacheTileProvider(ITileSourceProvider tileSourceProvider, string tilePathTemplate)
         {
-            _tileUriProvider = tileUriProvider;
+            _tileSourceProvider = tileSourceProvider;
             _tilePathTemplate = tilePathTemplate;
         }
 
@@ -30,17 +30,22 @@ namespace MapsControl.TileUriProviders
 
         #region ITileUriProvider
 
-        public Uri GetTileUri(int levelOfDetail, int x, int y)
+        public TileSource GetTileSource(int levelOfDetail, int x, int y)
         {
             string relativePath = _tilePathTemplate.ReplaceTileTemplates(levelOfDetail, x, y);
             string absolutePath = _isoStorage.GetIsoStorageAbsolutePath(relativePath);
 
             if (!_isoStorage.FileExists(relativePath))
             {
-                return _tileUriProvider.GetTileUri(levelOfDetail, x, y);
+                return _tileSourceProvider.GetTileSource(levelOfDetail, x, y);
             }
 
-            return new Uri(absolutePath);
+            return new TileUriSource(absolutePath);
+        }
+
+        public async Task<TileSource> GetTileSourceAsync(int levelOfDetail, int x, int y)
+        {
+            return GetTileSource(levelOfDetail, x, y);
         }
 
         #endregion

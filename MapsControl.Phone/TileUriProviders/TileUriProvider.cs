@@ -8,7 +8,7 @@ using MapsControl.Infrastructure;
 
 namespace MapsControl.TileUriProviders
 {
-    public class TileUriProvider : ITileUriProvider
+    public class TileUriProvider : ITileSourceProvider
     {
         #region Fields
 
@@ -27,11 +27,16 @@ namespace MapsControl.TileUriProviders
 
         #region ITileUriProvider
 
-        public Uri GetTileUri(int levelOfDetail, int x, int y)
+        public TileSource GetTileSource(int levelOfDetail, int x, int y)
         {
             string uriString = _tileUriTemplate.ReplaceTileTemplates(levelOfDetail, x, y);
 
-            return new Uri(uriString);
+            return new TileUriSource(uriString);
+        }
+
+        public async Task<TileSource> GetTileSourceAsync(int levelOfDetail, int x, int y)
+        {
+            return GetTileSource(levelOfDetail, x, y);
         }
 
         #endregion

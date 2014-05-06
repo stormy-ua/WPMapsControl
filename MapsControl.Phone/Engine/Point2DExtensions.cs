@@ -26,5 +26,15 @@ namespace MapsControl.Engine
         {
             return new Point2D(second.X - first.X, second.Y - first.Y);
         }
+
+        public static Point Move(this Point point, double offsetX, double offsetY)
+        {
+            return new Point(point.X + offsetX, point.Y + offsetY); 
+        }
+
+        public static Point ToPoint(this Point2D point)
+        {
+            return new Point(point.X, point.Y);
+        }
     }
 }

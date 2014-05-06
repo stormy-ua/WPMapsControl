@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MapsControl.Engine;
 
 namespace MapsControl.Presentation
 {
     public interface ITileView : IMapEntityView
     {
-        Uri Uri { get; set; }
+        TileSource TileSource { get; set; }
     }
 }

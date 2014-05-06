@@ -16,7 +16,7 @@ namespace MapsControl.Engine
         IObservable<Point2D> Translations { get; }
         IObservable<GeoCoordinate> GeoCoordinateCenters { get; }
         IObservable<double> Zooms { get; }
-        IObservable<ITileUriProvider> TileUriProviders { get; }
+        IObservable<ITileSourceProvider> TileUriProviders { get; }
         IObservable<IEnumerable<IMapEntityView>> EntityViewAdded { get; }
     }
 }

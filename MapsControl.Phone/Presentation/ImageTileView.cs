@@ -1,7 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using MapsControl.Engine;
 
 namespace MapsControl.Presentation
 {
@@ -10,6 +12,7 @@ namespace MapsControl.Presentation
         #region Fields
 
         private readonly int _tileSize;
+        private TileSource _tileSource;
 
         #endregion
 
@@ -23,29 +26,56 @@ namespace MapsControl.Presentation
             }
         }
 
-        public Uri Uri
+        public TileSource TileSource
         {
-            get { return Bitmap.UriSource; }
+            get { return _tileSource; }
             set
             {
-                if (value == null)
+                if (_tileSource == value)
                 {
                     return;
                 }
 
-#if DESKTOP
-                ((Image)_visualElement).Source = CreateImageSource(_tileSize);
-#endif
-                if (Bitmap.UriSource != value)
+                _tileSource = value;
+
+                try
                 {
+                    if (_tileSource is TileUriSource)
+                    {
 #if DESKTOP
-                    Bitmap.BeginInit();
+                        ((Image)_visualElement).Source = CreateImageSource(_tileSize);
+                        Bitmap.BeginInit();
 #endif
-                    Bitmap.UriSource = value;
+
+                        Bitmap.UriSource = ((TileUriSource)_tileSource).Uri;
+
 #if DESKTOP
-                    Bitmap.EndInit();
+                        Bitmap.EndInit();
 #endif
+                    }
+                    else if (_tileSource is TileByteArraySource)
+                    {
+#if DESKTOP
+                        ((Image)_visualElement).Source = ToBitmapImage(((TileByteArraySource)_tileSource).TileBytes);
+#endif
+#if WINDOWS_PHONE
+                        using (var stream = new MemoryStream(((TileByteArraySource)_tileSource).TileBytes))
+                        {
+                            Bitmap.SetSource(stream);
+                        }
+#endif
+                    }
+                    else
+                    {
+#if DESKTOP
+                        ((Image)_visualElement).Source = CreateImageSource(_tileSize);
+#endif
+                    }
                 }
+                catch (Exception)
+                {
+                }
+
             }
         }
 
@@ -63,6 +93,17 @@ namespace MapsControl.Presentation
 
         #region Methods
 
+#if DESKTOP
+        private static BitmapSource ToBitmapImage(byte[] bytes)
+        {
+            using (var stream = new MemoryStream(bytes))
+            {
+                var decoder = BitmapDecoder.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+                return decoder.Frames[0];
+            }
+        }
+#endif
+
         private static Image CreateImage(int tileSize)
         {
             var image = new Image
@@ -71,9 +112,7 @@ namespace MapsControl.Presentation
                 Height = tileSize,
                 CacheMode = new BitmapCache(),
                 RenderTransform = new TranslateTransform(),
-#if WINDOWS_PHONE
                 Source = CreateImageSource(tileSize)
-#endif
             };
             return image;
         }

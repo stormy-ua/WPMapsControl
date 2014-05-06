@@ -7,9 +7,14 @@ using MapsControl.Engine;
 
 namespace MapsControl.TileUriProviders
 {
-    public class NullTileUriProvider : ITileUriProvider
+    public class NullTileUriProvider : ITileSourceProvider
     {
-        public Uri GetTileUri(int levelOfDetail, int x, int y)
+        public TileSource GetTileSource(int levelOfDetail, int x, int y)
+        {
+            return null;
+        }
+
+        public async Task<TileSource> GetTileSourceAsync(int levelOfDetail, int x, int y)
         {
             return null;
         }

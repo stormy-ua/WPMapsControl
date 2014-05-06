@@ -3,13 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:presentation="clr-namespace:MapsControl.Presentation;assembly=MapsControl.Desktop"
         xmlns:mapsControl="clr-namespace:MapsControl;assembly=MapsControl.Desktop"
+        xmlns:desktop="clr-namespace:MapsControl.Desktop;assembly=MapsControl.Desktop"
         Title="MapsControl" Height="800" Width="800"
         ResizeMode="CanMinimize">
     <Grid x:Name="LayoutRoot" Background="Transparent">
 
         <Grid x:Name="ContentPanel">
             
-            <mapsControl:MapsControl x:Name="Map" GeoCoordinateCenter="50.39456, 30.5978478" LevelOfDetails="15">
+            <desktop:MapsControl x:Name="Map" GeoCoordinateCenter="50.39456, 30.5978478" LevelOfDetails="15">
                 <presentation:MapPolyline Path="50.39456,30.5978478 50.39266,30.598848 50.39346,30.601" />
                 <presentation:MapOverlay GeoCoordinate="{Binding Path=GeoCoordinateCenter, ElementName=Map}">
                     <Path Stroke="Green" Data="M 0,50 0,0 30,0 30,25 10,25 3,50 Z" Fill="Green" Width="30" Height="50" />
@@ -17,7 +18,7 @@
                 <presentation:MapOverlay x:Name="Marker" GeoCoordinate="50.39346,30.601">
                     <Path Stroke="Red" Data="M 0,50 0,0 30,0 30,25 10,25 3,50 Z" Fill="Red" Width="30" Height="50"/>
                 </presentation:MapOverlay>
-            </mapsControl:MapsControl>
+            </desktop:MapsControl>
             
             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center">
                 <Button Content="+" Width="40" Height="40" Background="Black" FontSize="15" Foreground="White"

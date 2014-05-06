@@ -26,16 +26,14 @@ namespace MapsControl.Presentation
             get { return _visualElement; }
         }
 
-        public double OffsetX
+        public Point Offset
         {
-            get { return TranslateTransform.X; }
-            set { TranslateTransform.X = value; }
-        }
-
-        public double OffsetY
-        {
-            get { return TranslateTransform.Y; }
-            set { TranslateTransform.Y = value; }
+            get { return new Point(TranslateTransform.X, TranslateTransform.Y); }
+            set
+            {
+                TranslateTransform.X = value.X;
+                TranslateTransform.Y = value.Y;
+            }
         }
 
         #endregion

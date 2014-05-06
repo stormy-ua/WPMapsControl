@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Windows.Controls;
 using MapsControl.Infrastructure;
 using MapsControl.Presentation;
 using MapsControl.TileUriProviders;
@@ -10,13 +12,13 @@ using System.Windows;
 using Microsoft.Phone.Reactive;
 #endif
 #if DESKTOP
-using System.Reactive;
 using System.Reactive.Linq;
+using System.IO;
 #endif
 
 namespace MapsControl.Engine
 {
-    public class MapPresenter : IMapPresenter
+    public class MapPresenter
     {
         #region Consts
 
@@ -28,16 +30,16 @@ namespace MapsControl.Engine
 
         #region Fields
 
-        private readonly int _tileResolution;
         private readonly IList<Tile> _tiles = new List<Tile>();
         private readonly IList<Pin> _pins = new List<Pin>();
-        private GeoCoordinate _geoCoordinateCenter;
-        private double _levelOfDetail = 14;
-        private ITileUriProvider _tileUriProvider;
-        private Size _viewWindowsSize;
+        private readonly IList<IMapOverlayView> _mapOverlayViews = new List<IMapOverlayView>();
         private readonly IMapView _mapView;
-
-        private readonly IList<MapOverlayPresenter> _mapOverlayPresenters = new List<MapOverlayPresenter>();
+        private ITileLoader _tileLoader;
+        private GeoCoordinate _geoCoordinateCenter;
+        private readonly int _tileResolution;
+        private double _levelOfDetail = 14;
+        private ITileSourceProvider _tileUriProvider;
+        private Size _viewWindowsSize;
 
         #endregion
 
@@ -77,7 +79,7 @@ namespace MapsControl.Engine
             }
         }
 
-        private ITileUriProvider TileUriProvider
+        private ITileSourceProvider TileUriProvider
         {
             get
             {
@@ -90,6 +92,7 @@ namespace MapsControl.Engine
                     return;
                 }
                 _tileUriProvider = value;
+                _tileLoader = new TileLoader(_tileUriProvider);
                 Initialize();
             }
         }
@@ -158,9 +161,10 @@ namespace MapsControl.Engine
                     var tile = _tiles[y + x * _tileResolution];
                     tile.MapX = pointInTileIndexes.X + x - _tileResolution / 2;
                     tile.MapY = pointInTileIndexes.Y + y - _tileResolution / 2;
+                    tile.LevelOfDetails = _levelOfDetail;
                     tile.OffsetX = (x - _tileResolution / 2) * TileSize - pointInTileRelativePixels.X + _viewWindowsSize.Width / 2;
                     tile.OffsetY = (y - _tileResolution / 2) * TileSize - pointInTileRelativePixels.Y + _viewWindowsSize.Height / 2;
-                    tile.Uri = TileUriProvider.GetTileUri((int)_levelOfDetail, tile.MapX, tile.MapY);
+                    _tileLoader.LoadAsync(tile);
                 }
             }
 
@@ -169,7 +173,7 @@ namespace MapsControl.Engine
 
         private void MoveTiles(Point2D offset)
         {
-            double minOffset = -1 * TileSize;  
+            const double minOffset = -1 * TileSize;  
             double maxOffset = TileSize * (_tileResolution - 1);
 
             foreach (var tile in _tiles)
@@ -181,25 +185,25 @@ namespace MapsControl.Engine
                 {
                     tile.OffsetX += _tileResolution * TileSize;
                     tile.MapX += _tileResolution;
-                    tile.Uri = TileUriProvider.GetTileUri((int)_levelOfDetail, tile.MapX, tile.MapY);
+                    _tileLoader.LoadAsync(tile);
                 }
                 else if (tile.OffsetX > maxOffset)
                 {
                     tile.OffsetX -= _tileResolution * TileSize;
                     tile.MapX -= _tileResolution;
-                    tile.Uri = TileUriProvider.GetTileUri((int)_levelOfDetail, tile.MapX, tile.MapY);
+                    _tileLoader.LoadAsync(tile);
                 }
                 else if (tile.OffsetY < minOffset)
                 {
                     tile.OffsetY += _tileResolution * TileSize;
                     tile.MapY += _tileResolution;
-                    tile.Uri = TileUriProvider.GetTileUri((int)_levelOfDetail, tile.MapX, tile.MapY);
+                    _tileLoader.LoadAsync(tile);
                 }
                 else if (tile.OffsetY > maxOffset)
                 {
                     tile.OffsetY -= _tileResolution * TileSize;
                     tile.MapY -= _tileResolution;
-                    tile.Uri = TileUriProvider.GetTileUri((int)_levelOfDetail, tile.MapX, tile.MapY);
+                    _tileLoader.LoadAsync(tile);
                 }
             }
 
@@ -220,15 +224,20 @@ namespace MapsControl.Engine
         {
             foreach (var tile in _tiles)
             {
-                var tileView = new ImageTileView(256);
-                var tilePresenter = new TilePresenter(tileView, tile);
+                ITileView tileView = new ImageTileView(256);
+
+                tile.TileSourceChanges.StartWith(tile.TileSource)
+                               .ObserveOn(SynchronizationContext.Current)
+                               .Subscribe(tileSource => tileView.TileSource = tileSource);
+                tile.OffsetChanges.StartWith(new Point(tile.OffsetX, tile.OffsetY))
+                               .Subscribe(offset => tileView.Offset = new Point(offset.X, offset.Y));
 
                 _mapView.Add(tileView);
             }
 
-            foreach (var mapOverlayPresenter in _mapOverlayPresenters)
+            foreach (var mapOverlayView in _mapOverlayViews)
             {
-                _mapView.Add(mapOverlayPresenter.View);
+                _mapView.Add(mapOverlayView);
             }
         }
 
@@ -237,10 +246,20 @@ namespace MapsControl.Engine
             foreach (var mapOverlay in views.OfType<IMapOverlayView>())
             {
                 var pin = new Pin { GeoCoordinate = mapOverlay.GeoCoordinate };
-                var mapOverlayPresenter = new MapOverlayPresenter(this, mapOverlay, pin);
-            
+                IMapOverlayView mapOverlayView = mapOverlay;
+
+                PositionPin(pin);
+                mapOverlay.GeoCoordinateChanged += (sender, coordinate) =>
+                {
+                    pin.GeoCoordinate = coordinate;
+                    PositionPin(pin);
+                };
+                pin.OffsetChanges.StartWith(new Point(pin.OffsetX, pin.OffsetY))
+                                 .Subscribe(offset => mapOverlayView.Offset = new Point(offset.X, offset.Y));
+
+                //_mapEntityView.OffsetY -= ((FrameworkElement)((ContentControl)_mapEntityView.VisualRoot).Content).Height;
                 AddPin(pin);
-                _mapOverlayPresenters.Add(mapOverlayPresenter);
+                _mapOverlayViews.Add(mapOverlayView);
             }
         }
 
@@ -249,7 +268,7 @@ namespace MapsControl.Engine
             _pins.Add(pin);
         }
 
-        public void PositionPin(Pin pin)
+        private void PositionPin(Pin pin)
         {
             if (pin.GeoCoordinate == null || _geoCoordinateCenter == null)
             {
