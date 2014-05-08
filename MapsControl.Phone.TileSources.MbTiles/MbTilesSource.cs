@@ -13,6 +13,7 @@ namespace MapsControl.Phone.TileSources.MbTiles
         #region Fields
 
         private readonly string _connectionString;
+        private SQLiteConnection _connection;
 
         #endregion
 
@@ -21,6 +22,7 @@ namespace MapsControl.Phone.TileSources.MbTiles
         public MbTilesSource(string databasePath)
         {
             _connectionString = Path.Combine(ApplicationData.Current.LocalFolder.Path, databasePath);
+            _connection = new SQLiteConnection(_connectionString);
         }
 
         #endregion
@@ -29,11 +31,11 @@ namespace MapsControl.Phone.TileSources.MbTiles
 
         public TileSource GetTileSource(int levelOfDetail, int x, int y)
         {
-            using (var connection = new SQLiteConnection(_connectionString))
+            //using (var connection = new SQLiteConnection(_connectionString))
             {
                 y = (int)Math.Pow(2, levelOfDetail) - y - 1;
 
-                var command = new SQLiteCommand(connection);
+                var command = new SQLiteCommand(_connection);
                 command.CommandText = string.Format("select tile_data from tiles where zoom_level={0} and tile_column={1} and tile_row={2}", levelOfDetail, x, y);
                 var blob = command.ExecuteScalar<byte[]>();
 

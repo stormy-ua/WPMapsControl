@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.Phone.Reactive;
+using System.Threading.Tasks;
 
 namespace MapsControl.Engine
 {
@@ -7,6 +8,7 @@ namespace MapsControl.Engine
         #region Fields
 
         private readonly ITileSourceProvider _tileUriProvider;
+        private readonly ISubject<Tile> _loadTileSubject = new Subject<Tile>(); 
 
         #endregion
 
@@ -24,6 +26,7 @@ namespace MapsControl.Engine
         public async Task LoadAsync(Tile tile)
         {
             tile.TileSource = await _tileUriProvider.GetTileSourceAsync((int)tile.LevelOfDetails, tile.MapX, tile.MapY);
+            //_loadTileSubject.OnNext(tile);
         }
 
         #endregion
