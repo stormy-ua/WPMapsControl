@@ -40,6 +40,10 @@ namespace MapsControl.Presentation
 
                 try
                 {
+                    if (_tileSource == TileSource.Empty)
+                    {
+                        //TODO: reset image
+                    }
                     if (_tileSource is TileUriSource)
                     {
 #if DESKTOP

@@ -8,7 +8,7 @@ namespace MapsControl.Presentation
 {
     public interface IMapView
     {
-        void Add(IMapEntityView mapEntityView);
+        void Add(IMapEntityView mapEntityView, XMapLayer layer);
         void Remove(IMapEntityView mapEntityView);        
     }
 }

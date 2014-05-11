@@ -18,6 +18,12 @@ using System.IO;
 
 namespace MapsControl.Engine
 {
+    public enum XMapLayer
+    {
+        Tile = 0,
+        Overlay = 1
+    }
+
     public class MapPresenter
     {
         #region Consts
@@ -248,7 +254,7 @@ namespace MapsControl.Engine
                 tile.OffsetChanges.StartWith(new Point(tile.OffsetX, tile.OffsetY))
                                .Subscribe(offset => tileView.Offset = new Point(offset.X, offset.Y));
 
-                _mapView.Add(tileView);
+                _mapView.Add(tileView, XMapLayer.Tile);
                 _tileViews.Add(tileView);
             }
         }
@@ -259,7 +265,7 @@ namespace MapsControl.Engine
 
             foreach (var mapOverlayView in _mapOverlayViews)
             {
-                _mapView.Add(mapOverlayView);
+                _mapView.Add(mapOverlayView, XMapLayer.Overlay);
             }
         }
 

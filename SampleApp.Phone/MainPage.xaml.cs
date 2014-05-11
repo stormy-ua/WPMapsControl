@@ -13,10 +13,10 @@ namespace SampleApp
         {
             InitializeComponent();
 
-            Map.TileUriProvider = TileUriProviders.OpenCycleMap
-                .WithCache("OpenCycleCache/{zoom}/{x}_{y}.png");
+            //Map.TileUriProvider = TileUriProviders.OpenCycleMap
+            //    .WithCache("OpenCycleCache/{zoom}/{x}_{y}.png");
 
-            //Map.TileUriProvider = new MbTilesSource("Kiev_Center_And_Left_Bank_13_17.db3");
+            Map.TileUriProvider = new MbTilesSource("Kiev_Center_And_Left_Bank_13_17.db3");
 
             Loaded += MainPage_Loaded;
         }

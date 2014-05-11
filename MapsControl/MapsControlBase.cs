@@ -131,9 +131,10 @@ namespace MapsControl
 
         #region IMapView
 
-        public void Add(IMapEntityView mapEntityView)
+        public void Add(IMapEntityView mapEntityView, XMapLayer layer)
         {
             _panel.Children.Add(mapEntityView.VisualRoot);
+            //Panel.SetZIndex(mapEntityView.VisualRoot, (int)layer);
         }
 
         public void Remove(IMapEntityView mapEntityView)
