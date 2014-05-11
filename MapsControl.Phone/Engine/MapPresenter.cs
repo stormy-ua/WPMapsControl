@@ -36,7 +36,7 @@ namespace MapsControl.Engine
         private readonly IMapView _mapView;
         private ITileLoader _tileLoader;
         private GeoCoordinate _geoCoordinateCenter;
-        private readonly int _tileResolution;
+        private Point2D _tileResolution;
         private double _levelOfDetail = 14;
         private ITileSourceProvider _tileUriProvider;
         private Size _viewWindowsSize;
@@ -108,6 +108,8 @@ namespace MapsControl.Engine
                     return;
                 }
                 _viewWindowsSize = value;
+                BuildTiles();
+                InitializeTileViews();
                 Initialize();
             }
         }
@@ -116,11 +118,9 @@ namespace MapsControl.Engine
 
         #region Constructor
 
-        public MapPresenter(IMapView mapView, IMapCommands mapCommands, int tileResolution)
+        public MapPresenter(IMapView mapView, IMapCommands mapCommands)
         {
-            _tileResolution = tileResolution;
             TileUriProvider = new NullTileUriProvider();
-            BuildTiles();
 
             _mapView = mapView;
             mapCommands.Translations.Subscribe(Move);
@@ -138,7 +138,14 @@ namespace MapsControl.Engine
 
         private void BuildTiles()
         {
-            Enumerable.Range(0, _tileResolution * _tileResolution)
+            _tiles.Clear();
+            int tileScaleX = (int)ViewWindowSize.Width / TileSize + 1;
+            int tileScaleY = (int)ViewWindowSize.Height / TileSize + 1;
+            _tileResolution = new Point2D(
+                tileScaleX % 2 > 0 ? tileScaleX + 2 : tileScaleX + 1,
+                tileScaleY % 2 > 0 ? tileScaleY + 2 : tileScaleY + 1);
+
+            Enumerable.Range(0, _tileResolution.X * _tileResolution.Y)
                 .Select(index => new Tile())
                 .ToList()
                 .ForEach(_tiles.Add);
@@ -154,17 +161,20 @@ namespace MapsControl.Engine
             Point2D pointInTileIndexes = _geoCoordinateCenter.ToPointInTileIndexes(_levelOfDetail, TileSize);
             Point2D pointInTileRelativePixels = _geoCoordinateCenter.ToPointInTileRelativePixels(_levelOfDetail, TileSize);
 
-            for (int x = 0; x < _tileResolution; ++x)
+            if (_tiles.Any())
             {
-                for (int y = 0; y < _tileResolution; ++y)
+                for (int x = 0; x < _tileResolution.X; ++x)
                 {
-                    var tile = _tiles[y + x * _tileResolution];
-                    tile.MapX = pointInTileIndexes.X + x - _tileResolution / 2;
-                    tile.MapY = pointInTileIndexes.Y + y - _tileResolution / 2;
-                    tile.LevelOfDetails = _levelOfDetail;
-                    tile.OffsetX = (x - _tileResolution / 2) * TileSize - pointInTileRelativePixels.X + _viewWindowsSize.Width / 2;
-                    tile.OffsetY = (y - _tileResolution / 2) * TileSize - pointInTileRelativePixels.Y + _viewWindowsSize.Height / 2;
-                    _tileLoader.LoadAsync(tile);
+                    for (int y = 0; y < _tileResolution.Y; ++y)
+                    {
+                        var tile = _tiles[y + x*_tileResolution.Y];
+                        tile.MapX = pointInTileIndexes.X + x - _tileResolution.X/2;
+                        tile.MapY = pointInTileIndexes.Y + y - _tileResolution.Y/2;
+                        tile.LevelOfDetails = _levelOfDetail;
+                        tile.OffsetX = (x - _tileResolution.X/2)*TileSize - pointInTileRelativePixels.X + _viewWindowsSize.Width/2;
+                        tile.OffsetY = (y - _tileResolution.Y/2)*TileSize - pointInTileRelativePixels.Y + _viewWindowsSize.Height/2;
+                        _tileLoader.LoadAsync(tile);
+                    }
                 }
             }
 
@@ -173,36 +183,38 @@ namespace MapsControl.Engine
 
         private void MoveTiles(Point2D offset)
         {
-            const double minOffset = -1 * TileSize;  
-            double maxOffset = TileSize * (_tileResolution - 1);
+            var minOffset = new Point2D(
+                -1 * TileSize, -1 * TileSize);
+            var maxOffset = new Point2D(
+                TileSize * (_tileResolution.X - 1), TileSize * (_tileResolution.Y - 1));
 
             foreach (var tile in _tiles)
             {
                 tile.OffsetX += offset.X;
                 tile.OffsetY += offset.Y;
 
-                if (tile.OffsetX < minOffset)
+                if (tile.OffsetX < minOffset.X)
                 {
-                    tile.OffsetX += _tileResolution * TileSize;
-                    tile.MapX += _tileResolution;
+                    tile.OffsetX += _tileResolution.X * TileSize;
+                    tile.MapX += _tileResolution.X;
                     _tileLoader.LoadAsync(tile);
                 }
-                else if (tile.OffsetX > maxOffset)
+                else if (tile.OffsetX > maxOffset.X)
                 {
-                    tile.OffsetX -= _tileResolution * TileSize;
-                    tile.MapX -= _tileResolution;
+                    tile.OffsetX -= _tileResolution.X * TileSize;
+                    tile.MapX -= _tileResolution.X;
                     _tileLoader.LoadAsync(tile);
                 }
-                else if (tile.OffsetY < minOffset)
+                else if (tile.OffsetY < minOffset.Y)
                 {
-                    tile.OffsetY += _tileResolution * TileSize;
-                    tile.MapY += _tileResolution;
+                    tile.OffsetY += _tileResolution.Y * TileSize;
+                    tile.MapY += _tileResolution.Y;
                     _tileLoader.LoadAsync(tile);
                 }
-                else if (tile.OffsetY > maxOffset)
+                else if (tile.OffsetY > maxOffset.Y)
                 {
-                    tile.OffsetY -= _tileResolution * TileSize;
-                    tile.MapY -= _tileResolution;
+                    tile.OffsetY -= _tileResolution.Y * TileSize;
+                    tile.MapY -= _tileResolution.Y;
                     _tileLoader.LoadAsync(tile);
                 }
             }
@@ -220,8 +232,12 @@ namespace MapsControl.Engine
             MoveTiles(offset);
         }
 
-        private void OnInitialized(EventArgs args)
+        private readonly IList<ITileView> _tileViews = new List<ITileView>(); 
+
+        private void InitializeTileViews()
         {
+            _tileViews.ForEach(_mapView.Remove);
+
             foreach (var tile in _tiles)
             {
                 ITileView tileView = new ImageTileView(256);
@@ -233,7 +249,13 @@ namespace MapsControl.Engine
                                .Subscribe(offset => tileView.Offset = new Point(offset.X, offset.Y));
 
                 _mapView.Add(tileView);
+                _tileViews.Add(tileView);
             }
+        }
+
+        private void OnInitialized(EventArgs args)
+        {
+            InitializeTileViews();
 
             foreach (var mapOverlayView in _mapOverlayViews)
             {

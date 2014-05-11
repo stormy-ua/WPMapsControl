@@ -1,4 +1,11 @@
-﻿using Microsoft.Phone.Reactive;
+﻿#if WINDOWS_PHONE
+using Microsoft.Phone.Reactive;
+#endif
+#if DESKTOP
+using System.Reactive.Linq;
+using System.IO;
+using System.Reactive.Subjects;
+#endif
 using System.Threading.Tasks;
 
 namespace MapsControl.Engine

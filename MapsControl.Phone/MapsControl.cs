@@ -31,7 +31,7 @@ namespace MapsControl
                                         .Select(args => args.EventArgs.NewItems.OfType<IMapEntityView>())
                                         .Where(entityView => entityView != null && entityView.Any());
 
-            _mapPresenter = new MapPresenter(this, _mapCommands, 5);
+            _mapPresenter = new MapPresenter(this, _mapCommands);
         }
 
         #endregion

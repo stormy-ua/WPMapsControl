@@ -26,7 +26,7 @@ namespace MapsControl.Desktop
             _mapCommands.Initialized = Observable.FromEventPattern<RoutedEventArgs>(this, "Loaded")
                       .Select(args => args.EventArgs);
 
-            _mapCommands.SizeChanges.Subscribe(size => _panel.Clip = new RectangleGeometry { Rect = new Rect(0, 0, size.Width, size.Height) });
+            //_mapCommands.SizeChanges.Subscribe(size => _panel.Clip = new RectangleGeometry { Rect = new Rect(0, 0, size.Width, size.Height) });
             _mapCommands.EntityViewAdded = Observable.FromEventPattern<NotifyCollectionChangedEventArgs>(MapElements, "CollectionChanged")
                                         .Where(args => args.EventArgs.Action == NotifyCollectionChangedAction.Add)
                                         .Select(args => args.EventArgs.NewItems.OfType<IMapEntityView>())
@@ -43,7 +43,7 @@ namespace MapsControl.Desktop
                 .CombineLatest(mouseMovePoints, (point2, point1) => (point2 - point1).ToPoint2D())
                 .Repeat();
 
-            _mapPresenter = new MapPresenter(this, _mapCommands, 5);
+            _mapPresenter = new MapPresenter(this, _mapCommands);
         }
 
         #endregion

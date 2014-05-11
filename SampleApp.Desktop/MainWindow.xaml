@@ -5,7 +5,7 @@
         xmlns:mapsControl="clr-namespace:MapsControl;assembly=MapsControl.Desktop"
         xmlns:desktop="clr-namespace:MapsControl.Desktop;assembly=MapsControl.Desktop"
         Title="MapsControl" Height="800" Width="800"
-        ResizeMode="CanMinimize">
+        ResizeMode="CanResize">
     <Grid x:Name="LayoutRoot" Background="Transparent">
 
         <Grid x:Name="ContentPanel">
