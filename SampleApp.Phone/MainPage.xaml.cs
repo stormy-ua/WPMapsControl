@@ -8,7 +8,19 @@ namespace SampleApp
 {
     public partial class MainPage : PhoneApplicationPage
     {
-        // Constructor
+        #region GeoCoordinate
+
+        public static readonly DependencyProperty GeoCoordinateProperty = DependencyProperty.Register(
+            "GeoCoordinate", typeof (GeoCoordinate), typeof (MainPage), new PropertyMetadata(default(GeoCoordinate)));
+
+        public GeoCoordinate GeoCoordinate
+        {
+            get { return (GeoCoordinate) GetValue(GeoCoordinateProperty); }
+            set { SetValue(GeoCoordinateProperty, value); }
+        }
+
+        #endregion
+
         public MainPage()
         {
             InitializeComponent();
@@ -17,24 +29,17 @@ namespace SampleApp
             //    .WithCache("OpenCycleCache/{zoom}/{x}_{y}.png");
 
             Map.TileUriProvider = new MbTilesSource("Kiev_Center_And_Left_Bank_13_17.db3");
+            //Map.TileUriProvider = new MbTilesSource("Harkovskiy.db3");
 
             Loaded += MainPage_Loaded;
+            GeoCoordinate = new GeoCoordinate(50.39346, 30.601);
         }
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
-            var geoCoordinateWatcher = new GeoCoordinateWatcher(GeoPositionAccuracy.Default);
-            geoCoordinateWatcher.MovementThreshold = 1;
+            var geoCoordinateWatcher = new GeoCoordinateWatcher(GeoPositionAccuracy.Default) {MovementThreshold = 1};
             geoCoordinateWatcher.PositionChanged +=
-                (s, args) =>
-                {
-                    if (Marker == null)
-                    {
-                        return;
-                    }
-
-                    Dispatcher.BeginInvoke(() => Marker.GeoCoordinate = args.Position.Location);
-                };
+                (s, args) => Dispatcher.BeginInvoke(() => GeoCoordinate = args.Position.Location);
 
             geoCoordinateWatcher.Start(false);
         }

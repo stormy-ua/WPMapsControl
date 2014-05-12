@@ -1,4 +1,6 @@
-﻿#if WINDOWS_PHONE
+﻿using System.Linq;
+using MapsControl.Infrastructure;
+#if WINDOWS_PHONE
 using System.Collections.Generic;
 using Microsoft.Phone.Reactive;
 #endif
@@ -15,9 +17,21 @@ namespace MapsControl.Engine
 {
     public class TileDownloadRequest
     {
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+
         public Tile Tile { get; set; }
         public int LevelOfDetails { get; set; }
         public Point2D MapCoords { get; set; }
+        public CancellationToken CancellationToken { get; private set; }
+        public TileDownloadRequest()
+        {
+            CancellationToken = _cancellationTokenSource.Token;
+        }
+
+        public void Cancel()
+        {
+            _cancellationTokenSource.Cancel();
+        }
     }
 
     public class TileLoader : ITileLoader
@@ -25,8 +39,9 @@ namespace MapsControl.Engine
         #region Fields
 
         private readonly ITileSourceProvider _tileUriProvider;
-        private readonly Queue<TileDownloadRequest> _downloadRequests =
-            new Queue<TileDownloadRequest>(); 
+        private readonly List<TileDownloadRequest> _downloadRequests =
+            new List<TileDownloadRequest>();
+        private readonly object _syncObject = new object();
 
         #endregion
 
@@ -35,44 +50,45 @@ namespace MapsControl.Engine
         public TileLoader(ITileSourceProvider tileUriProvider)
         {
             _tileUriProvider = tileUriProvider;
-
-            for (int j = 0; j < 1; ++j)
-            {
-                Task.Factory.StartNew(DownloadsProcessing);
-            }
         }
 
         #endregion
 
         #region ITileLoader
 
-        public async Task LoadAsync(Tile tile)
+        public Task LoadAsync(Tile tile)
         {
-            //tile.TileSource = TileSource.Empty;
-            //tile.TileSource = await _tileUriProvider.GetTileSourceAsync((int)tile.LevelOfDetails, tile.MapX, tile.MapY);
-            var downloadRequest = new TileDownloadRequest
-                {
-                    Tile = tile,
-                    LevelOfDetails = (int) tile.LevelOfDetails,
-                    MapCoords = new Point2D(tile.MapX, tile.MapY)
-                };
-            _downloadRequests.Enqueue(downloadRequest);
+            return Task.Factory.StartNew(() => Load(tile));
         }
 
-        private void DownloadsProcessing()
+        private void Load(Tile tile)
         {
-            for (;;Thread.Sleep(100))
+            var downloadRequest = new TileDownloadRequest
             {
-                if(_downloadRequests.Count == 0)
-                { 
-                    continue;
-                }
-
-                TileDownloadRequest downloadRequest = _downloadRequests.Dequeue();
-
-                downloadRequest.Tile.TileSource = _tileUriProvider
-                    .GetTileSource(downloadRequest.LevelOfDetails, downloadRequest.MapCoords.X, downloadRequest.MapCoords.Y);
+                Tile = tile,
+                LevelOfDetails = (int)tile.LevelOfDetails,
+                MapCoords = new Point2D(tile.MapX, tile.MapY)
+            };
+            lock (_syncObject)
+            {
+                _downloadRequests.Where(r => r.Tile == downloadRequest.Tile).ForEach(r => r.Cancel());
+                _downloadRequests.Add(downloadRequest);
             }
+
+            var tileSource = _tileUriProvider
+                .GetTileSource(downloadRequest.LevelOfDetails, downloadRequest.MapCoords.X,
+                    downloadRequest.MapCoords.Y);
+
+            lock (_syncObject)
+            {
+                _downloadRequests.Remove(downloadRequest);
+            }
+            if (downloadRequest.CancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            downloadRequest.Tile.TileSource = tileSource;
         }
 
         #endregion

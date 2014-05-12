@@ -43,6 +43,10 @@ namespace MapsControl.Presentation
                     if (_tileSource == TileSource.Empty)
                     {
                         //TODO: reset image
+                        if (Bitmap != null)
+                        {
+                            Bitmap.UriSource = null;
+                        }
                     }
                     if (_tileSource is TileUriSource)
                     {
@@ -60,7 +64,8 @@ namespace MapsControl.Presentation
                     else if (_tileSource is TileByteArraySource)
                     {
 #if DESKTOP
-                        ((Image)_visualElement).Source = ToBitmapImage(((TileByteArraySource)_tileSource).TileBytes);
+                        
+ = ToBitmapImage(((TileByteArraySource)_tileSource).TileBytes);
 #endif
 #if WINDOWS_PHONE
                         using (var stream = new MemoryStream(((TileByteArraySource)_tileSource).TileBytes))

@@ -13,7 +13,9 @@
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
-    shell:SystemTray.IsVisible="True">
+    shell:SystemTray.IsVisible="True"
+    x:Name="Root"
+    >
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <Grid x:Name="ContentPanel">
             <mapsControl:MapsControl x:Name="Map" 
@@ -29,7 +31,7 @@
                         </Path.RenderTransform>
                     </Path>
                 </presentation:MapOverlay>
-                <presentation:MapOverlay x:Name="Marker" GeoCoordinate="50.39346,30.601">
+                <presentation:MapOverlay GeoCoordinate="{Binding ElementName=Root, Path=GeoCoordinate}">
                     <Path Stroke="Red" Data="M 0,50 0,0 30,0 30,25 10,25 3,50 Z" Fill="Red"
                       Width="30"
                       Height="50">
