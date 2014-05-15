@@ -148,11 +148,7 @@ namespace MapsControl
 
         public void Remove(IMapEntityView mapEntityView)
         {
-            if (_tilesLayer.Children.Remove(mapEntityView.VisualRoot))
-            {
-                return;
-            }
-
+            _tilesLayer.Children.Remove(mapEntityView.VisualRoot);
             _overlaysLayer.Children.Remove(mapEntityView.VisualRoot);
         }
 

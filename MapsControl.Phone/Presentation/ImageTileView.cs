@@ -64,8 +64,8 @@ namespace MapsControl.Presentation
                     else if (_tileSource is TileByteArraySource)
                     {
 #if DESKTOP
-                        
- = ToBitmapImage(((TileByteArraySource)_tileSource).TileBytes);
+
+                        ((Image)_visualElement).Source = ToBitmapImage(((TileByteArraySource)_tileSource).TileBytes);
 #endif
 #if WINDOWS_PHONE
                         using (var stream = new MemoryStream(((TileByteArraySource)_tileSource).TileBytes))

@@ -25,7 +25,7 @@ namespace SampleApp.Desktop
             InitializeComponent();
 
 //            Map.TileUriProvider = TileUriProviders.GoogleHybridMap;
-            Map.TileUriProvider = new MbTilesSource(@"C:\Maps\Kiev_Center_And_Left_Bank_13_17.db3");
+            Map.TileUriProvider = new MbTilesSource(@"C:\temp\wp2\IsolatedStore\Kiev_Center_And_Left_Bank_13_17.db3");
         }
 
         private void ZoomInButtonOnClick(object sender, RoutedEventArgs e)

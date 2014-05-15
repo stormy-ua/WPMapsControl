@@ -59,5 +59,10 @@ namespace SampleApp
         {
             Map.LevelOfDetails--;
         }
+
+        private void CenterCurrentLocation(object sender, RoutedEventArgs e)
+        {
+            Map.GeoCoordinateCenter = GeoCoordinate;
+        }
     }
 }

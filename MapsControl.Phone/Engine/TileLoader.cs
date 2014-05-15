@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using MapsControl.Infrastructure;
-#if WINDOWS_PHONE
 using System.Collections.Generic;
+#if WINDOWS_PHONE
 using Microsoft.Phone.Reactive;
 #endif
 #if DESKTOP
