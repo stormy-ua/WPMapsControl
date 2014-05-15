@@ -25,7 +25,7 @@ namespace MapsControl
             _mapCommands.Initialized = Observable.FromEvent<RoutedEventArgs>(this, "Loaded")
                       .Select(args => args.EventArgs);
 
-            _mapCommands.SizeChanges.Subscribe(size => _panel.Clip = new RectangleGeometry { Rect = new Rect(0, 0, size.Width, size.Height) });
+            _mapCommands.SizeChanges.Subscribe(size => _tilesLayer.Clip = new RectangleGeometry { Rect = new Rect(0, 0, size.Width, size.Height) });
             _mapCommands.EntityViewAdded = Observable.FromEvent<NotifyCollectionChangedEventArgs>(MapElements, "CollectionChanged")
                                         .Where(args => args.EventArgs.Action == NotifyCollectionChangedAction.Add)
                                         .Select(args => args.EventArgs.NewItems.OfType<IMapEntityView>())

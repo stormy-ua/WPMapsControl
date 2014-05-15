@@ -1,14 +1,33 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:desktop="clr-namespace:MapsControl.Desktop">
+    xmlns:desktop="clr-namespace:MapsControl.Desktop"
+    xmlns:presentation="clr-namespace:MapsControl.Presentation">
     <Style TargetType="desktop:MapsControl">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="desktop:MapsControl">
-                    <Canvas x:Name="PART_Panel" CacheMode="BitmapCache" Background="Black"/>
+                    <Grid>
+                        <Canvas x:Name="PART_TilesLayer" CacheMode="BitmapCache" Background="Black"/>
+                        <Canvas x:Name="PART_OverlaysLayer" CacheMode="BitmapCache" Background="Transparent"/>
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+    <Style TargetType="presentation:MapOverlay">
+        <Setter Property="CacheMode" Value="BitmapCache" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="presentation:MapOverlay">
+                    <ContentPresenter CacheMode="BitmapCache" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <!--        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <TranslateTransform />
+            </Setter.Value>
+        </Setter>-->
     </Style>
 </ResourceDictionary>

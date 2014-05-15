@@ -35,7 +35,8 @@ namespace MapsControl
         #region Fields
 
         protected MapPresenter _mapPresenter;
-        protected Panel _panel;
+        protected Panel _tilesLayer;
+        protected Panel _overlaysLayer;
         protected readonly MapCommands _mapCommands = new MapCommands();
 
         #endregion
@@ -126,20 +127,33 @@ namespace MapsControl
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            _panel = (Panel)GetTemplateChild("PART_Panel");
+            _tilesLayer = (Panel)GetTemplateChild("PART_TilesLayer");
+            _overlaysLayer = (Panel)GetTemplateChild("PART_OverlaysLayer");
         }
 
         #region IMapView
 
         public void Add(IMapEntityView mapEntityView, XMapLayer layer)
         {
-            _panel.Children.Add(mapEntityView.VisualRoot);
-            //Panel.SetZIndex(mapEntityView.VisualRoot, (int)layer);
+            switch (layer)
+            {
+                case XMapLayer.Tile:
+                    _tilesLayer.Children.Add(mapEntityView.VisualRoot);
+                    break;
+                case XMapLayer.Overlay:
+                    _overlaysLayer.Children.Add(mapEntityView.VisualRoot);
+                    break;
+            }
         }
 
         public void Remove(IMapEntityView mapEntityView)
         {
-            _panel.Children.Remove(mapEntityView.VisualRoot);
+            if (_tilesLayer.Children.Remove(mapEntityView.VisualRoot))
+            {
+                return;
+            }
+
+            _overlaysLayer.Children.Remove(mapEntityView.VisualRoot);
         }
 
         #endregion

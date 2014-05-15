@@ -7,7 +7,10 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="mapsControl:MapsControl">
-                    <Canvas x:Name="PART_Panel" CacheMode="BitmapCache" Background="Black"/>
+                    <Grid>
+                        <Canvas x:Name="PART_TilesLayer" CacheMode="BitmapCache" Background="Black"/>
+                        <Canvas x:Name="PART_OverlaysLayer" CacheMode="BitmapCache" Background="Transparent"/>
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
