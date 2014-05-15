@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Windows.Controls;
 using MapsControl.Infrastructure;
@@ -189,6 +190,8 @@ namespace MapsControl.Engine
 
         private void MoveTiles(Point2D offset)
         {
+            Debug.WriteLine("Move: {0}:{1}", offset.X, offset.Y);
+
             var minOffset = new Point2D(
                 -1 * TileSize, -1 * TileSize);
             var maxOffset = new Point2D(
@@ -252,7 +255,11 @@ namespace MapsControl.Engine
                                .ObserveOn(SynchronizationContext.Current)
                                .Subscribe(tileSource => tileView.TileSource = tileSource);
                 tile.OffsetChanges.StartWith(new Point(tile.OffsetX, tile.OffsetY))
-                               .Subscribe(offset => tileView.Offset = new Point(offset.X, offset.Y));
+                               .ObserveOn(SynchronizationContext.Current)
+                               .Subscribe(offset =>
+                               {
+                                   tileView.Offset = new Point(offset.X, offset.Y);
+                               });
 
                 _mapView.Add(tileView, XMapLayer.Tile);
                 _tileViews.Add(tileView);
@@ -283,9 +290,14 @@ namespace MapsControl.Engine
                     PositionPin(pin);
                 };
                 pin.OffsetChanges.StartWith(new Point(pin.OffsetX, pin.OffsetY))
-                                 .Subscribe(offset => mapOverlayView.Offset = new Point(offset.X, offset.Y));
+                                 .ObserveOn(SynchronizationContext.Current)
+                                 .Subscribe(offset =>
+                                 {
+                                     mapOverlayView.Offset = new Point(
+                                         offset.X,
+                                         offset.Y - ((FrameworkElement)((ContentControl)mapOverlayView.VisualRoot).Content).Height);
+                                 });
 
-                //_mapEntityView.OffsetY -= ((FrameworkElement)((ContentControl)_mapEntityView.VisualRoot).Content).Height;
                 AddPin(pin);
                 _mapOverlayViews.Add(mapOverlayView);
             }

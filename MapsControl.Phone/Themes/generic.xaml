@@ -1,7 +1,8 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:mapsControl="clr-namespace:MapsControl">
+    xmlns:mapsControl="clr-namespace:MapsControl"
+    xmlns:presentation="clr-namespace:MapsControl.Presentation;assembly=MapsControl.Phone">
     <Style TargetType="mapsControl:MapsControl">
         <Setter Property="Template">
             <Setter.Value>
@@ -10,5 +11,20 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+    <Style TargetType="presentation:MapOverlay">
+        <Setter Property="CacheMode" Value="BitmapCache" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="presentation:MapOverlay">
+                    <ContentPresenter CacheMode="BitmapCache" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+<!--        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <TranslateTransform />
+            </Setter.Value>
+        </Setter>-->
     </Style>
 </ResourceDictionary>

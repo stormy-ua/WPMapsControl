@@ -27,7 +27,7 @@ namespace MapsControl.Presentation
         }
 
         public Point Offset
-        {
+        {   
             get { return new Point(TranslateTransform.X, TranslateTransform.Y); }
             set
             {
