@@ -13,10 +13,5 @@ namespace MapsControl.TileUriProviders
         {
             return null;
         }
-
-        public async Task<TileSource> GetTileSourceAsync(int levelOfDetail, int x, int y)
-        {
-            return null;
-        }
     }
 }

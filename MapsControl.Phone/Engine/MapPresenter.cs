@@ -130,7 +130,7 @@ namespace MapsControl.Engine
             TileUriProvider = new NullTileUriProvider();
 
             _mapView = mapView;
-            mapCommands.Translations.Subscribe(Move);
+            mapCommands.Translations.Where(translation => !translation.IsZero()).Subscribe(Move);
             mapCommands.SizeChanges.Subscribe(size => ViewWindowSize = size);
             mapCommands.Initialized.Take(1).Subscribe(OnInitialized);
             mapCommands.EntityViewAdded.Subscribe(OnEntityViewAdded);
@@ -178,8 +178,11 @@ namespace MapsControl.Engine
                         tile.MapX = pointInTileIndexes.X + x - _tileResolution.X/2;
                         tile.MapY = pointInTileIndexes.Y + y - _tileResolution.Y/2;
                         tile.LevelOfDetails = _levelOfDetail;
-                        tile.OffsetX = (x - _tileResolution.X/2)*TileSize - pointInTileRelativePixels.X + _viewWindowsSize.Width/2;
-                        tile.OffsetY = (y - _tileResolution.Y/2)*TileSize - pointInTileRelativePixels.Y + _viewWindowsSize.Height/2;
+
+                        tile.Offset = new Point(
+                            (x - _tileResolution.X/2)*TileSize - pointInTileRelativePixels.X + _viewWindowsSize.Width/2,
+                            (y - _tileResolution.Y/2)*TileSize - pointInTileRelativePixels.Y + _viewWindowsSize.Height/2);
+
                         _tileLoader.LoadAsync(tile);
                     }
                 }
@@ -199,30 +202,29 @@ namespace MapsControl.Engine
 
             foreach (var tile in _tiles)
             {
-                tile.OffsetX += offset.X;
-                tile.OffsetY += offset.Y;
+                tile.Offset = tile.Offset.Move(offset);
 
-                if (tile.OffsetX < minOffset.X)
+                if (tile.Offset.X < minOffset.X)
                 {
-                    tile.OffsetX += _tileResolution.X * TileSize;
+                    tile.Offset = tile.Offset.Move(_tileResolution.X * TileSize, 0);
                     tile.MapX += _tileResolution.X;
                     _tileLoader.LoadAsync(tile);
                 }
-                else if (tile.OffsetX > maxOffset.X)
+                else if (tile.Offset.X > maxOffset.X)
                 {
-                    tile.OffsetX -= _tileResolution.X * TileSize;
+                    tile.Offset = tile.Offset.Move(-1*_tileResolution.X*TileSize, 0);
                     tile.MapX -= _tileResolution.X;
                     _tileLoader.LoadAsync(tile);
                 }
-                else if (tile.OffsetY < minOffset.Y)
+                else if (tile.Offset.Y < minOffset.Y)
                 {
-                    tile.OffsetY += _tileResolution.Y * TileSize;
+                    tile.Offset = tile.Offset.Move(0, _tileResolution.Y * TileSize);
                     tile.MapY += _tileResolution.Y;
                     _tileLoader.LoadAsync(tile);
                 }
-                else if (tile.OffsetY > maxOffset.Y)
+                else if (tile.Offset.Y > maxOffset.Y)
                 {
-                    tile.OffsetY -= _tileResolution.Y * TileSize;
+                    tile.Offset = tile.Offset.Move(0, -1 * _tileResolution.Y * TileSize);
                     tile.MapY -= _tileResolution.Y;
                     _tileLoader.LoadAsync(tile);
                 }
@@ -230,8 +232,7 @@ namespace MapsControl.Engine
 
             foreach (var pin in _pins)
             {
-                pin.OffsetX += offset.X;
-                pin.OffsetY += offset.Y;
+                pin.Offset = pin.Offset.Move(offset);
             }
         }
 
@@ -254,12 +255,9 @@ namespace MapsControl.Engine
                 tile.TileSourceChanges.StartWith(tile.TileSource)
                                .ObserveOn(SynchronizationContext.Current)
                                .Subscribe(tileSource => tileView.TileSource = tileSource);
-                tile.OffsetChanges.StartWith(new Point(tile.OffsetX, tile.OffsetY))
+                tile.OffsetChanges.StartWith(tile.Offset)
                                .ObserveOn(SynchronizationContext.Current)
-                               .Subscribe(offset =>
-                               {
-                                   tileView.Offset = new Point(offset.X, offset.Y);
-                               });
+                               .Subscribe(offset => tileView.Offset = offset);
 
                 _mapView.Add(tileView, XMapLayer.Tile);
                 _tileViews.Add(tileView);
@@ -289,7 +287,7 @@ namespace MapsControl.Engine
                     pin.GeoCoordinate = coordinate;
                     PositionPin(pin);
                 };
-                pin.OffsetChanges.StartWith(new Point(pin.OffsetX, pin.OffsetY))
+                pin.OffsetChanges.StartWith(pin.Offset)
                                  .ObserveOn(SynchronizationContext.Current)
                                  .Subscribe(offset =>
                                  {
@@ -318,8 +316,7 @@ namespace MapsControl.Engine
             Point2D pinWindowPoint = pin.GeoCoordinate.ToWindowPoint(
                 _geoCoordinateCenter, _levelOfDetail, _viewWindowsSize);
 
-            pin.OffsetX = pinWindowPoint.X;
-            pin.OffsetY = pinWindowPoint.Y;
+            pin.Offset = pinWindowPoint.ToPoint();
         }
 
         private void AddPolyline(PolylineEntity polylineEntity)

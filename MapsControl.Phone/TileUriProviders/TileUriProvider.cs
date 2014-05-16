@@ -34,11 +34,6 @@ namespace MapsControl.TileUriProviders
             return new TileUriSource(uriString);
         }
 
-        public async Task<TileSource> GetTileSourceAsync(int levelOfDetail, int x, int y)
-        {
-            return GetTileSource(levelOfDetail, x, y);
-        }
-
         #endregion
     }
 }

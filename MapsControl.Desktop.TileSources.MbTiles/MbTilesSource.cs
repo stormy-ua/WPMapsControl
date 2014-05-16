@@ -45,11 +45,6 @@ namespace MapsControl.Desktop.TileSources.MbTiles
             return null;
         }
 
-        public Task<TileSource> GetTileSourceAsync(int levelOfDetail, int x, int y)
-        {
-            return Task.Factory.StartNew(() => GetTileSource(levelOfDetail, x, y));
-        }
-
         #endregion
     }
 }
