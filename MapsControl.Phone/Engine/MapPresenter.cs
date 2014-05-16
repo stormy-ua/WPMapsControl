@@ -239,6 +239,8 @@ namespace MapsControl.Engine
         private void Move(Point2D offset)
         {
             _geoCoordinateCenter = _geoCoordinateCenter.OffsetByPixels(offset, _levelOfDetail);
+            // Update geo coordinate center of map view.
+            _mapView.GeoCoordinateCenter = _geoCoordinateCenter;
             MoveTiles(offset);
         }
 
