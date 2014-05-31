@@ -2,7 +2,7 @@
 
 namespace MapsControl.Engine
 {
-    public class Pin : MapEntity
+    public class MapPoint : MapEntity
     {
         #region Fields
 
@@ -25,5 +25,17 @@ namespace MapsControl.Engine
         }
 
         #endregion
+    }
+
+    public class MapLineEntity
+    {
+        public MapPoint Begin { get; private set; }
+        public MapPoint End { get; private set; }
+
+        public MapLineEntity(MapPoint begin, MapPoint end)
+        {
+            Begin = begin;
+            End = end;
+        }
     }
 }

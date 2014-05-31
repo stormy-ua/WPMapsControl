@@ -14,7 +14,6 @@ using Microsoft.Phone.Reactive;
 #endif
 #if DESKTOP
 using System.Reactive.Linq;
-using System.IO;
 #endif
 
 namespace MapsControl.Engine
@@ -38,8 +37,8 @@ namespace MapsControl.Engine
         #region Fields
 
         private readonly IList<Tile> _tiles = new List<Tile>();
-        private readonly IList<Pin> _pins = new List<Pin>();
-        private readonly IList<IMapOverlayView> _mapOverlayViews = new List<IMapOverlayView>();
+        private readonly IList<MapPoint> _pins = new List<MapPoint>();
+        private readonly IList<IMapEntityView> _mapOverlayViews = new List<IMapEntityView>();
         private readonly IMapView _mapView;
         private ITileLoader _tileLoader;
         private GeoCoordinate _geoCoordinateCenter;
@@ -280,7 +279,7 @@ namespace MapsControl.Engine
         {
             foreach (var mapOverlay in views.OfType<IMapOverlayView>())
             {
-                var pin = new Pin { GeoCoordinate = mapOverlay.GeoCoordinate };
+                var pin = new MapPoint { GeoCoordinate = mapOverlay.GeoCoordinate };
                 IMapOverlayView mapOverlayView = mapOverlay;
 
                 PositionPin(pin);
@@ -298,17 +297,43 @@ namespace MapsControl.Engine
                                          offset.Y - ((FrameworkElement)((ContentControl)mapOverlayView.VisualRoot).Content).Height);
                                  });
 
-                AddPin(pin);
+                _pins.Add(pin);
                 _mapOverlayViews.Add(mapOverlayView);
+            }
+
+            foreach (var mapLine in views.OfType<IMapLineEntityView>())
+            {
+                var begin = new MapPoint { GeoCoordinate = mapLine.Begin };
+                var end = new MapPoint { GeoCoordinate = mapLine.End };
+                var line = new MapLineEntity(begin, end);
+                IMapLineEntityView mapLineView = mapLine;
+
+                PositionPin(begin);
+                PositionPin(end);
+                mapLine.BeginChanged += (sender, coordinate) =>
+                {
+                    begin.GeoCoordinate = coordinate;
+                    PositionPin(begin);
+                };
+                mapLine.EndChanged += (sender, coordinate) =>
+                {
+                    end.GeoCoordinate = coordinate;
+                    PositionPin(end);
+                };
+                begin.OffsetChanges.StartWith(begin.Offset)
+                                 .ObserveOn(SynchronizationContext.Current)
+                                 .Subscribe(offset => mapLineView.Offset = new Point(offset.X, offset.Y));
+                end.OffsetChanges.StartWith(end.Offset)
+                                 .ObserveOn(SynchronizationContext.Current)
+                                 .Subscribe(offset => mapLineView.EndOffset = new Point(offset.X, offset.Y));
+
+                _pins.Add(line.Begin);
+                _pins.Add(line.End);
+                _mapOverlayViews.Add(mapLineView);
             }
         }
 
-        private void AddPin(Pin pin)
-        {
-            _pins.Add(pin);
-        }
-
-        private void PositionPin(Pin pin)
+        private void PositionPin(MapPoint pin)
         {
             if (pin.GeoCoordinate == null || _geoCoordinateCenter == null)
             {
@@ -319,11 +344,6 @@ namespace MapsControl.Engine
                 _geoCoordinateCenter, _levelOfDetail, _viewWindowsSize);
 
             pin.Offset = pinWindowPoint.ToPoint();
-        }
-
-        private void AddPolyline(PolylineEntity polylineEntity)
-        {
-            polylineEntity.Pins.ForEach(_pins.Add);
         }
 
         #endregion

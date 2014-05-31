@@ -84,4 +84,131 @@ namespace MapsControl.Presentation
             }
         }
     }
+
+    public interface IMapLineEntityView : IMapEntityView
+    {
+        GeoCoordinate Begin { get; set; }
+        GeoCoordinate End { get; set; }
+        
+        Point EndOffset { get; set; }
+
+        event EventHandler<GeoCoordinate> BeginChanged;
+        event EventHandler<GeoCoordinate> EndChanged;
+    }
+
+    public class MapLine : MapElement, IMapLineEntityView
+    {
+        #region Fields
+
+        private readonly Polyline _line = new Polyline
+        {
+            Stroke = new SolidColorBrush(Colors.Orange),
+            StrokeThickness = 5
+        };
+
+        #endregion
+
+        #region Path
+
+        public static readonly DependencyProperty BeginProperty =
+            DependencyProperty.Register("Begin", typeof (GeoCoordinate), typeof (MapLine), new PropertyMetadata(default(GeoCoordinate), OnBeginChanged));
+
+        private static void OnBeginChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
+        {
+            var mapLine = (MapLine)dependencyObject;
+            var begin = (GeoCoordinate)args.NewValue;
+            mapLine.OnBeginChanged(begin);
+        }
+
+        [TypeConverter(typeof(GeoCoordinateConverter))]
+        public GeoCoordinate Begin
+        {
+            get { return (GeoCoordinate) GetValue(BeginProperty); }
+            set { SetValue(BeginProperty, value); }
+        }
+
+        public static readonly DependencyProperty EndProperty =
+            DependencyProperty.Register("End", typeof (GeoCoordinate), typeof (MapLine), new PropertyMetadata(default(GeoCoordinate), OnEndChanged));
+
+        private static void OnEndChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
+        {
+            var mapLine = (MapLine)dependencyObject;
+            var end = (GeoCoordinate)args.NewValue;
+            mapLine.OnEndChanged(end);
+        }
+
+        [TypeConverter(typeof(GeoCoordinateConverter))]
+        public GeoCoordinate End
+        {
+            get { return (GeoCoordinate) GetValue(EndProperty); }
+            set { SetValue(EndProperty, value); }
+        }
+
+        #endregion
+
+        #region Constructors
+
+        public MapLine()
+        {
+            //DefaultStyleKey = typeof(MapOverlay);
+            RenderTransform = new TranslateTransform();
+
+            _line.Points.Add(new Point());
+            _line.Points.Add(new Point());
+        }
+
+        #endregion
+
+        public event EventHandler<GeoCoordinate> BeginChanged;
+
+        public event EventHandler<GeoCoordinate> EndChanged;
+
+        private TranslateTransform TranslateTransform
+        {
+            get { return (TranslateTransform)RenderTransform; }
+        }
+        
+        public FrameworkElement VisualRoot
+        {
+            get { return _line; }
+        }
+
+//        public Point Offset
+//        {
+//            get { return new Point(TranslateTransform.X, TranslateTransform.Y); }
+//            set
+//            {
+//                TranslateTransform.X = value.X;
+//                TranslateTransform.Y = value.Y;
+//            }
+//        }
+
+        public Point Offset
+        {
+            get { return _line.Points[0]; }
+            set { _line.Points[0] = value; }
+        }
+
+        public Point EndOffset
+        {
+            get { return _line.Points[1]; }
+            set { _line.Points[1] = value; }
+        }
+
+        private void OnBeginChanged(GeoCoordinate geoCoordinate)
+        {
+            if (BeginChanged != null)
+            {
+                BeginChanged(this, geoCoordinate);
+            }
+        }
+
+        private void OnEndChanged(GeoCoordinate geoCoordinate)
+        {
+            if (EndChanged != null)
+            {
+                EndChanged(this, geoCoordinate);
+            }
+        }
+    }
 }

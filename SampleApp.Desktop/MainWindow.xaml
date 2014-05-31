@@ -18,6 +18,7 @@
                 <presentation:MapOverlay x:Name="Marker" GeoCoordinate="50.39346,30.601">
                     <Path Stroke="Red" Data="M 0,50 0,0 30,0 30,25 10,25 3,50 Z" Fill="Red" Width="30" Height="50"/>
                 </presentation:MapOverlay>
+                <presentation:MapLine Begin="50.39456,30.5978478" End="50.39346,30.601" />
             </desktop:MapsControl>
             
             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center">

@@ -88,11 +88,11 @@
     <Compile Include="..\MapsControl.Phone\Engine\MapMath.cs">
       <Link>Engine\MapMath.cs</Link>
     </Compile>
+    <Compile Include="..\MapsControl.Phone\Engine\MapPoint.cs">
+      <Link>Engine\MapPoint.cs</Link>
+    </Compile>
     <Compile Include="..\MapsControl.Phone\Engine\MapPresenter.cs">
       <Link>Engine\MapPresenter.cs</Link>
-    </Compile>
-    <Compile Include="..\MapsControl.Phone\Engine\Pin.cs">
-      <Link>Engine\Pin.cs</Link>
     </Compile>
     <Compile Include="..\MapsControl.Phone\Engine\Point2D.cs">
       <Link>Engine\Point2D.cs</Link>

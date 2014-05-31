@@ -12,15 +12,15 @@ namespace MapsControl.Presentation
 {
     public class PolylineEntity
     {
-        public ObservableCollection<Pin> Pins { get; private set; } 
+        public ObservableCollection<MapPoint> Pins { get; private set; } 
 
         public PolylineEntity(IEnumerable<GeoCoordinate> geoCoordinates)
         {
-            Pins = new ObservableCollection<Pin>();
+            Pins = new ObservableCollection<MapPoint>();
 
             if (geoCoordinates != null)
             {
-                geoCoordinates.Select(c => new Pin { GeoCoordinate = c }).ForEach(Pins.Add);                
+                geoCoordinates.Select(c => new MapPoint { GeoCoordinate = c }).ForEach(Pins.Add);                
             }
         }
     }

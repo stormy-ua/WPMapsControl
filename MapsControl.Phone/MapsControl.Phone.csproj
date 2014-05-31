@@ -94,7 +94,7 @@
     <Compile Include="Engine\ITileSourceProvider.cs" />
     <Compile Include="Engine\MapCommands.cs" />
     <Compile Include="Engine\MapEntity.cs" />
-    <Compile Include="Engine\Pin.cs" />
+    <Compile Include="Engine\MapPoint.cs" />
     <Compile Include="Engine\Point2D.cs" />
     <Compile Include="Engine\Point2DExtensions.cs" />
     <Compile Include="Engine\TileByteArraySource.cs" />

@@ -17,8 +17,6 @@ namespace MapsControl.Engine
         #region Fields
 
         private readonly ISubject<Point> _offsetChangesSubject = new Subject<Point>();
-//        private double _offsetX;
-//        private double _offsetY;
         private Point _offset;
 
         #endregion
@@ -30,32 +28,6 @@ namespace MapsControl.Engine
         public int MapX { get; set; }
 
         public int MapY { get; set; }
-
-//        public double OffsetX
-//        {
-//            get { return _offsetX; }
-//            set
-//            {
-//                if (_offsetX != value)
-//                {
-//                    _offsetX = value;
-//                    _offsetChangesSubject.OnNext(new Point(OffsetX, OffsetY));
-//                }
-//            }
-//        }
-//
-//        public double OffsetY
-//        {
-//            get { return _offsetY; }
-//            set
-//            {
-//                if (_offsetY != value)
-//                {
-//                    _offsetY = value;
-//                    _offsetChangesSubject.OnNext(new Point(OffsetX, OffsetY));
-//                }
-//            }
-//        }
 
         public Point Offset
         {
