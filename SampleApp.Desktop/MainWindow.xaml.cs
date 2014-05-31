@@ -25,7 +25,7 @@ namespace SampleApp.Desktop
             InitializeComponent();
 
             //Map.TileUriProvider = TileUriProviders.OpenCycleMap;
-            Map.TileUriProvider = new MbTilesSource(@"D:\Private\sd\maps\Kiev_Center_And_Left_Bank_13_17.db3");
+            Map.TileUriProvider = new MbTilesSource(@"D:\SD\Own\Maps\Kiev_Center_And_Left_Bank_13_17.db3");
         }
 
         private void ZoomInButtonOnClick(object sender, RoutedEventArgs e)
